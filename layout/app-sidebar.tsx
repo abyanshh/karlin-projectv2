@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 import {
@@ -112,8 +113,9 @@ export const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
+        <SidebarSeparator className="mx-auto"/>
       <SidebarFooter>
-        <div className="p-4">
+        <div className="p-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

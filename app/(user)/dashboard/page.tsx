@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    AlertCircle,
+  AlertCircle,
   CheckCircle2,
   Clock,
   FolderOpen,
@@ -99,7 +99,7 @@ const page = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm">Total Proyek</p>
-                <p className="text-3xl font-bold text-primary">24</p>
+                <p className="text-3xl font-bold">24</p>
               </div>
               <FolderOpen className="h-8 w-8 text-primary" />
             </div>
@@ -135,7 +135,7 @@ const page = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm">Tim Aktif</p>
-                <p className="text-3xl font-bold text-primary">42</p>
+                <p className="text-3xl font-bold">42</p>
               </div>
               <Users className="h-8 w-8 text-primary" />
             </div>
@@ -151,16 +151,15 @@ const page = () => {
         <CardContent>
           <div className="space-y-4">
             {projects.slice(0, 3).map((project) => (
-              <div
+              <Link
                 key={project.id}
-                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center space-x-4 w-1/3">
                   {getStatusIcon(project.status)}
                   <div>
-                    <h3 className="font-semibold">
-                      {project.name}
-                    </h3>
+                    <h3 className="font-semibold text-secondary">{project.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {project.client}
                     </p>
@@ -195,13 +194,15 @@ const page = () => {
 
                   <div className="flex w-2/5 items-center justify-end gap-4">
                     {getStatusBadge(project.status)}
-                    <Button variant="ghost" size="sm">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                    >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>
-
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
           <div className="mt-4">

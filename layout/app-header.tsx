@@ -1,14 +1,30 @@
+'use client'
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Plus, Search } from "lucide-react";
 import { ModeToggle } from "@/components/toggle-theme";
+import { usePathname } from "next/navigation";
 
 const AppHeader = () => {
+
+  const pathname = usePathname()
+
+  const pageTitle = (() => {
+    if (pathname === "/dashboard") return "Dashboard"
+    if (pathname === "/dashboard/projects") return "Daftar Proyek"
+    if (pathname === "/dashboard/calendar") return "Kalender Acara"
+    if (pathname === "/dashboard/team") return "Daftar Anggota"
+    if (pathname.startsWith("/dashboard/projects/")) return "Detail Proyek"
+    return "Aplikasi"
+  })
+
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
         <SidebarTrigger />
+        {pageTitle()}
       </div>
       <div className="flex items-center space-x-4">
         <div className="relative">
