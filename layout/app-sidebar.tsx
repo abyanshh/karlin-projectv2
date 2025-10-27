@@ -92,9 +92,9 @@ export const AppSidebar = () => {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-2 p-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location === item.url}>

@@ -77,7 +77,7 @@ const LoginPage = () => {
                   className="rounded-md"
                 />
               </div>
-              <CardTitle className="text-2xl font-bold text-secondary">
+              <CardTitle className="text-2xl font-bold">
                 Masuk ke Akun Anda
               </CardTitle>
               <p className="text-muted-foreground">

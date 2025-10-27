@@ -1,7 +1,7 @@
-
+import Calendar from "./Calendar";
 const page = () => {
   return (
-    <div>page</div>
+    <Calendar />
   )
 }
 
