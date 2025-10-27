@@ -4,7 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Shield, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function ProfileOverview({ data }: { data: any }) {
+interface ProfileData {
+  name?: string;
+  position?: string;
+  department?: string;
+  location?: string;
+  joinDate?: string;
+}
+
+
+export default function ProfileOverview({ data }: { data: ProfileData }) {
   return (
     <Card>
       <CardContent className="p-6">

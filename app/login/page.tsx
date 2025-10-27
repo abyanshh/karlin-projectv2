@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@/context/SessionContext";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import api from "@/lib/axios";
 
 const LoginPage = () => {
+  const { login } = useSession();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,27 +24,36 @@ const LoginPage = () => {
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    // Simulasi proses login
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        toast({
-          title: "Login berhasil!",
-          description: "Selamat datang di dashboard Karlin Mastrindo",
-        });
-        router.push("/dashboard");
-      } else {
-        toast({
-          title: "Login gagal",
-          description: "Mohon lengkapi email dan password",
-          variant: "destructive",
-        });
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
+  try {
+    const res = await api.post("/login", formData);
+    const { accessToken, refreshToken, user } = res.data;
+
+    localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+    login({ user, accessToken });
+
+    toast({
+      title: "Login berhasil!",
+      description: `Selamat datang ${user.name}`,
+    });
+
+    router.push("/dashboard");
+  } catch (err: any) {
+    toast({
+      title: "Login gagal",
+      description: err.response?.data?.message || "Email atau password salah",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({

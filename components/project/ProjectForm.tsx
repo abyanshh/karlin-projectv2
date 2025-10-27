@@ -87,12 +87,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       });
 
       router.push("/dashboard/projects");
-    } catch (error: any) {
-      toast({
-        title: "Terjadi kesalahan",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: "Terjadi kesalahan",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 

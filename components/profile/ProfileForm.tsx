@@ -18,15 +18,15 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 interface ProfileData {
-  name: string;
-  email: string;
-  phone: string;
-  birthdate: string;
-  position: string;
-  department: string;
-  location: string;
-  bio: string;
-  joinDate: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  birthdate?: string;
+  position?: string;
+  department?: string;
+  location?: string;
+  bio?: string;
+  joinDate?: string;
 }
 
 export default function ProfileForm({ data } : { data: ProfileData }) {
