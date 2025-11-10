@@ -1,21 +1,29 @@
-'use client'
-
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import ProjectForm from "@/components/project/ProjectForm";
+import { projectDataList } from "@/data/project";
 
-const Page = () => {
-  const params = useParams();
-  const id = params.id;
-  const data = {
-    name: "John Doe",
-    client: "PT Abadi Jaya",
-    description: "Follow the video tutorial above. Understand how to use each tool in the Figma application. Also learn how to make a good and correct design. Starting from spacing, typography, content, and many other design hierarchies. Then try to make it yourself with your imagination and inspiration.",
-    deadline: "2024-01-15",
-    pic: "Dimas Ukin",
-    status: "Berlangsung",
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const { id } = await props.params;
+  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/${id}`, {
+  //   cache: "no-store",
+  // });
+  // if (!res.ok) {
+  //   console.error("Gagal memuat data proyek");
+  // }
+  // const project = await res.json();
+
+  const project = projectDataList
+
+  if (!project) {
+    return (
+      <div className="p-6 text-center bg-card w-full rounded-md py-10">
+        <p className="text-muted-foreground text-sm">
+          Data proyek tidak ditemukan.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -36,9 +44,8 @@ const Page = () => {
         </div>
       </div>
 
-      <ProjectForm mode="edit" initialData={data} />
+      <ProjectForm mode="edit" initialData={project} id={id} />
     </div>
   );
 };
 
-export default Page;

@@ -1,101 +1,61 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import type { Project } from "@/type/ProjectList/project";
+import { createProject, editProject } from "@/action/project";
 
-interface Project {
-  name: string;
-  client: string;
-  description: string;
-  deadline: string;
-  pic: string;
-  status: string;
-}
+
+type ProjectFormData = Partial<Project>;
 
 interface ProjectFormProps {
-  mode: "create" | "edit"; // menentukan apakah form ini buat tambah atau edit
-  initialData?: Project; // data awal untuk edit
-  id?: string; // dipakai untuk PUT saat edit
+  mode: "create" | "edit";
+  initialData?: Project;
+  id: string;
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({
-  mode,
-  initialData,
-  id,
-}) => {
+export default function ProjectForm({ mode, initialData, id }: ProjectFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+  const [formData, setFormData] = useState<ProjectFormData>(initialData || {});
 
-  const [formData, setFormData] = useState<Project>(
-    initialData || {
-      name: "",
-      client: "",
-      description: "",
-      deadline: "",
-      pic: "",
-      status: "",
-    }
-  );
-
-  const handleChange = (field: keyof Project, value: string) => {
+  const handleChange = <K extends keyof Project>(field: K, value: Project[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    startTransition(async () => {
+      let result;
+      if (mode === "edit") {
+        result = await editProject(id, formData);
+      } else {
+        result = await createProject(formData);
+      }
 
-    try {
-      const method = mode === "edit" ? "PUT" : "POST";
-      const url =
-        mode === "edit"
-          ? `/api/projects/${id}` // edit
-          : "/api/projects"; // create
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) throw new Error("Gagal menyimpan data proyek");
-
-      toast({
-        title: mode === "edit" ? "Perubahan disimpan!" : "Proyek dibuat!",
-        description:
-          mode === "edit"
-            ? "Data proyek berhasil diperbarui."
-            : "Proyek baru berhasil ditambahkan.",
-      });
-
-      router.push("/dashboard/projects");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
+      if (result.success) {
+        toast({
+          title: result.message,
+        });
+        router.push(mode === "edit" ? `/dashboard/projects/${id}` : "/dashboard/projects");
+      } else {
         toast({
           title: "Terjadi kesalahan",
-          description: error.message,
+          description: result.message,
           variant: "destructive",
         });
       }
-    }
+    });
   };
 
   return (
@@ -143,13 +103,23 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Detail Proyek</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="po">Nomor PO</Label>
+              <Input
+                type="number"
+                id="po"
+                value={formData.po}
+                onChange={(e) => handleChange("po", Number(e.target.value))}
+                placeholder="Masukkan nomor PO"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="deadline">Deadline</Label>
               <Input
@@ -162,12 +132,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pic">PIC (Person in Charge)</Label>
+              <Label htmlFor="pic">PIC (Penanggung Jawab)</Label>
               <Input
                 id="pic"
                 value={formData.pic}
                 onChange={(e) => handleChange("pic", e.target.value)}
-                placeholder="Nama penanggung jawab"
+                placeholder="Nama PIC"
                 required
               />
             </div>
@@ -182,24 +152,65 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   <SelectValue placeholder="Pilih status proyek" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Berlangsung">Berlangsung</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="in-progress">Berlangsung</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="Planning">Pending</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="progress">Progress (%)</Label>
+              <Input
+                type="number"
+                id="progress"
+                value={formData.progress}
+                placeholder="Progress"
+                onChange={(e) =>
+                  handleChange("progress", Number(e.target.value))
+                }
+                min={0}
+                max={100}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="team">Jumlah Tim</Label>
+              <Input
+                type="number"
+                id="team"
+                placeholder="Jumlah tim"
+                value={formData.team}
+                onChange={(e) => handleChange("team", Number(e.target.value))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="NameSales">Nama Sales</Label>
+              <Input
+                id="NameSales"
+                value={formData.NameSales}
+                onChange={(e) => handleChange("NameSales", e.target.value)}
+                placeholder="Nama sales"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
-
       <div className="flex justify-end">
-        <Button type="submit" className="flex items-center gap-2">
+        <Button type="submit" disabled={isPending} className="flex items-center gap-2">
           <Save className="w-4 h-4" />
-          {mode === "edit" ? "Simpan Perubahan" : "Buat Proyek"}
+          {isPending
+            ? "Menyimpan..."
+            : mode === "edit"
+            ? "Simpan Perubahan"
+            : "Buat Proyek"}
         </Button>
       </div>
     </form>
   );
-};
+}
 
-export default ProjectForm;
+
+

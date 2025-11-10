@@ -45,7 +45,6 @@ import {
 } from "@/components/ui/table";
 import Image from "next/image";
 import { getTimeAgo } from "@/lib/TimeAgo";
-import Link from "next/link";
 import {
   Dialog,
   DialogClose,
@@ -58,82 +57,62 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
+export type User = {
+  id: string;
+  image: string;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  role: string;
+  lastOnline: string;
+};
+
+// ==== DATA DUMMY ====
 const data: User[] = [
   {
     id: "m5gr84i9",
     image: "https://github.com/shadcn.png",
     name: "John Doe",
     email: "ken99@example.com",
+    phone: "+62 812-3456-7890",
+    location: "Jakarta",
     role: "Staff",
     lastOnline: "2025-10-24T18:30:00Z",
   },
   {
     id: "3u1reuv4",
     image: "https://github.com/shadcn.png",
-    name: "John Does",
+    name: "Jane Smith",
     email: "Abe45@example.com",
+    phone: "+62 813-2222-4444",
+    location: "Bandung",
     role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
+    lastOnline: "2025-10-22T18:30:00Z",
   },
   {
     id: "derv1ws0",
     image: "https://github.com/shadcn.png",
-    name: "John Doesing",
+    name: "Alex Johnson",
     email: "Monserrat44@example.com",
-    role: "Staffcom",
-    lastOnline: "2025-10-24T18:30:00Z",
+    phone: "+62 857-1122-3344",
+    location: "Surabaya",
+    role: "Admin",
+    lastOnline: "2025-10-20T18:30:00Z",
   },
   {
     id: "5kma53ae",
     image: "https://github.com/shadcn.png",
-    name: "John Does",
+    name: "Lisa Brown",
     email: "Silas22@example.com",
+    phone: "+62 895-1234-5678",
+    location: "Bali",
     role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    image: "https://github.com/shadcn.png",
-    name: "John Doe",
-    email: "carmella@example.com",
-    role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
-  },
-  {
-    id: "zcxv9j4x",
-    image: "https://github.com/shadcn.png",
-    name: "John Does",
-    email: "daxton@example.com",
-    role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
-  },
-  {
-    id: "xhjv8p4z",
-    image: "https://github.com/shadcn.png",
-    name: "John Doesing",
-    email: "katheryn@example.com",
-    role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
-  },
-  {
-    id: "v3zg5x9n",
-    image: "https://github.com/shadcn.png",
-    name: "John Doe",
-    email: "kristina@example.com",
-    role: "Staff",
-    lastOnline: "2025-09-24T18:30:00Z",
+    lastOnline: "2025-10-19T18:30:00Z",
   },
 ];
 
-export type User = {
-  id: string;
-  image: string;
-  name: string;
-  email: string;
-  role: string;
-  lastOnline: string;
-};
-
+// ==== KOLOM TABLE ====
 export const columns: ColumnDef<User>[] = [
   {
     id: "select",
@@ -159,17 +138,15 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <div
-          className="flex gap-2 items-center cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="w-4 h-4" />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Name
+        <ArrowUpDown className="w-4 h-4" />
+      </div>
+    ),
     cell: ({ row }) => {
       const member = row.original;
       return (
@@ -181,41 +158,45 @@ export const columns: ColumnDef<User>[] = [
             height={25}
             className="rounded-full"
           />
-          <div>
-            <div className="font-medium">{member.name}</div>
-          </div>
+          <div className="font-medium">{member.name}</div>
         </div>
       );
     },
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <div
-          className="flex gap-2 items-center cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="w-4 h-4" />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Email
+        <ArrowUpDown className="w-4 h-4" />
+      </div>
+    ),
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
+    accessorKey: "phone",
+    header: "Phone",
+    cell: ({ row }) => <div>{row.getValue("phone")}</div>,
+  },
+  {
+    accessorKey: "location",
+    header: "Location",
+    cell: ({ row }) => <div>{row.getValue("location")}</div>,
+  },
+  {
     accessorKey: "role",
-    header: ({ column }) => {
-      return (
-        <div
-          className="flex gap-2 items-center cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Role
-          <ArrowUpDown className="w-4 h-4" />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Role
+        <ArrowUpDown className="w-4 h-4" />
+      </div>
+    ),
     cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
   },
   {
@@ -230,8 +211,7 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const User = row.original;
-
+      const user = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -243,7 +223,7 @@ export const columns: ColumnDef<User>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(User.id)}
+              onClick={() => navigator.clipboard.writeText(user.id)}
             >
               <Copy />
               Copy ID
@@ -263,13 +243,11 @@ export const columns: ColumnDef<User>[] = [
   },
 ];
 
+// ==== KOMPONEN TABLE ====
 export function TeamTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
@@ -300,81 +278,75 @@ export function TeamTable() {
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm bg-card"
         />
-        <div className="flex items-center gap-2">
-          <Dialog>
-            <form action="">
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus />
-                  Add User
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add User</DialogTitle>
-                  <DialogDescription>
-                    Add a new member to apps
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name-1">Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="Pedro Duarte"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      placeholder="example@gmail.com"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="role">Role</Label>
-                    <Input
-                      id="role"
-                      name="role"
-                      placeholder="Staff"
-                    />
-                  </div>
+        <Dialog>
+          <form action="">
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline">
+                <Plus /> Add User
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add User</DialogTitle>
+                <DialogDescription>
+                  Add a new member to the app.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" name="name" placeholder="Pedro Duarte" />
                 </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button type="submit">Save changes</Button>
-                </DialogFooter>
-              </DialogContent>
-            </form>
-          </Dialog>
-        </div>
+
+                <div className="grid gap-3">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    placeholder="example@gmail.com"
+                  />
+                </div>
+
+                <div className="grid gap-3">
+                  <Label htmlFor="role">Role</Label>
+                  <Input id="role" name="role" placeholder="Staff" />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
       </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
+
+      <div className="rounded-md border bg-card">
+        <Table className="min-w-6xl">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -405,6 +377,7 @@ export function TeamTable() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}

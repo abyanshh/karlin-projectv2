@@ -48,13 +48,13 @@ const menuItems = [
     url: "/dashboard/projects",
     icon: FolderOpen,
   },
+  // {
+  //   title: "Kalender",
+  //   url: "/dashboard/calendar",
+  //   icon: Calendar,
+  // },
   {
-    title: "Kalender",
-    url: "/dashboard/calendar",
-    icon: Calendar,
-  },
-  {
-    title: "Tim",
+    title: "Staff",
     url: "/dashboard/team",
     icon: Users,
   },

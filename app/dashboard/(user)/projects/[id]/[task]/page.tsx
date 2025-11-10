@@ -13,11 +13,11 @@ const page = () => {
   const params = useParams();
   const { id, task } = params;
 
-  // Data dummy untuk simulasi
+ 
   const data = {
     id: task,
     title: "Dokumentasi Projek Tahap 1",
-    status: "berlangsung",
+    status: "waiting for verification",
     description:
       "Dokumentasikan seluruh progres tahap 1 termasuk kebutuhan, desain awal, dan alur sistem.",
     deadline: "2025-11-05",
@@ -152,6 +152,11 @@ const page = () => {
               ))}
             </div>
           )}
+          <div className="flex justify-end">
+            <Button className="mt-4">
+              Mark As Done
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -4,9 +4,9 @@ import { Card } from '@/components/ui/card'
 
 const page = () => {
   return (
-    <Card className='px-5'>
+    <div>
       <TeamTable />
-    </Card>
+    </div>
   )
 }
 

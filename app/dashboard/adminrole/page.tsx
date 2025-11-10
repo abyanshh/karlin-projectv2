@@ -137,9 +137,9 @@ export default async function page() {
         </div>
 
         {/* ===== Projects Table ===== */}
-        <Card>
+        <Card className="mb-4">
           <CardHeader>
-            <CardTitle>Proyek Terbaru</CardTitle>
+            <CardTitle>Taken Project List</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -197,10 +197,69 @@ export default async function page() {
                 </Link>
               ))}
             </div>
-            <div className="mt-4">
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/projects">Lihat Semua Proyek</Link>
-              </Button>
+          </CardContent>
+        </Card>
+
+        {/* ===== Projects Table ===== */}
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>Available Project List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {projects.slice(0, 3).map((project) => (
+                <Link
+                  key={project.id}
+                  href={`/dashboard/projects/${project.id}`}
+                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center space-x-4 w-1/3">
+                    {getStatusIcon(project.status)}
+                    <div>
+                      <h3 className="font-semibold">{project.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {project.client}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-6 w-2/3">
+                    <div className="flex flex-col w-1/5">
+                      <p className="text-sm text-muted-foreground">Progress</p>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-20 h-2 bg-muted rounded-full">
+                          <div
+                            className="h-2 bg-primary rounded-full"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium">
+                          {project.progress}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col w-1/5 text-center">
+                      <p className="text-sm text-muted-foreground">Deadline</p>
+                      <p className="text-sm font-medium">{project.deadline}</p>
+                    </div>
+
+                    <div className="flex flex-col w-1/5 text-center">
+                      <p className="text-sm text-muted-foreground">PIC</p>
+                      <p className="text-sm font-medium">
+                        {project.pic ? project.pic : "-"}
+                      </p>
+                    </div>
+
+                    <div className="flex w-2/5 items-center justify-end gap-4">
+                      {getStatusBadge(project.status)}
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </CardContent>
         </Card>

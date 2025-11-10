@@ -1,28 +1,16 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
-import { MoreHorizontal, CheckCircle2, Clock, AlertCircle, Calendar, Users } from "lucide-react";
+import { MoreHorizontal, CheckCircle2, Clock, AlertCircle, Calendar, User } from "lucide-react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
-
-type ProjectStatus = "completed" | "in-progress" | "planning" | string;
-
-interface Project {
-  id: number;
-  name: string;
-  client: string;
-  status: ProjectStatus;
-  progress: number;
-  dueDate: string;
-  team: number;
-  description: string;
-}
+import type { Project } from "@/type/ProjectList/project";
 
 interface ProjectListProps {
   data: Project[];
 }
 
-const getStatusBadge = (status: ProjectStatus) => {
+const getStatusBadge = (status: string) => {
   switch (status) {
     case "completed":
       return <Badge className="bg-green-100 text-green-800 border-green-200">Selesai</Badge>;
@@ -35,7 +23,7 @@ const getStatusBadge = (status: ProjectStatus) => {
   }
 };
 
-const getStatusIcon = (status: ProjectStatus) => {
+const getStatusIcon = (status: string) => {
   switch (status) {
     case "completed":
       return <CheckCircle2 className="h-4 w-4 text-green-600" />;
@@ -60,7 +48,6 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
                 <div>
                   <h3 className="text-xl font-semibold">{project.name}</h3>
                   <p className="text-muted-foreground">{project.client}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
@@ -92,17 +79,17 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
                 <div>
                   <p className="text-sm text-muted-foreground">Deadline</p>
                   <p className="text-sm font-medium">
-                    {new Date(project.dueDate).toLocaleDateString("id-ID")}
+                    {project.deadline}
                   </p>
                 </div>
               </div>
 
               {/* Team */}
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <User className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Tim</p>
-                  <p className="text-sm font-medium">{project.team} orang</p>
+                  <p className="text-sm text-muted-foreground">PIC</p>
+                  <p className="text-sm font-medium">{project.pic}</p>
                 </div>
               </div>
 

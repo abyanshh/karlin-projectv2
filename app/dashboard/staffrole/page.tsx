@@ -2,13 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertCircle,
-  ArrowDownToLine,
   Calendar,
   CheckCircle2,
   Clock,
   Ellipsis,
   MoreHorizontal,
-  TriangleAlert,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -80,66 +78,10 @@ export default async function page() {
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex-1/3">
-        {/* ===== Stats Cards ===== */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Projek Masuk</p>
-                  <p className="text-3xl font-bold">{projects.length}</p>
-                </div>
-                <ArrowDownToLine className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Projek telah diambil</p>
-                  <p className="text-3xl font-bold">{projects.length}</p>
-                </div>
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">
-                    Projek mendekati deadline
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {projects.filter((p) => p.status === "in-progress")
-                      .length}
-                  </p>
-                </div>
-                <TriangleAlert className="h-8 w-8 text-yellow-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Projek melewati deadline</p>
-                  <p className="text-3xl font-bold">
-                    {projects.filter((p) => p.status === "completed")
-                      .length}
-                  </p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-red-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* ===== Projects Table ===== */}
-        <Card>
+        <Card className="mb-4">
           <CardHeader>
-            <CardTitle>Proyek Terbaru</CardTitle>
+            <CardTitle>Taken Project List</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -196,11 +138,6 @@ export default async function page() {
                   </div>
                 </Link>
               ))}
-            </div>
-            <div className="mt-4">
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/projects">Lihat Semua Proyek</Link>
-              </Button>
             </div>
           </CardContent>
         </Card>
