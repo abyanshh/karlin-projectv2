@@ -179,8 +179,14 @@ export default function Page() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await api.get("/api/project");
-        setProjects(res.data);
+        if(user.role === "admin" || user.role === "sales") {
+          const res = await api.get("/api/project/overview");
+          setProjects(res.data);
+        }
+        else{
+          const res = await api.get("/api/project");
+          setProjects(res.data);
+        }
       } catch (err) {
         console.error("Gagal memuat project:", err);
       }
