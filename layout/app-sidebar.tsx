@@ -38,7 +38,6 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "@/context/SessionContext";
 
-const { user } = useSession();
 const menuItems = [
   {
     title: "Dashboard",
@@ -61,6 +60,8 @@ const menuItems = [
 export const AppSidebar = () => {
   const router = useRouter();
   const location = usePathname();
+  const { user } = useSession();
+
   const handleLogout = () => {
     router.push("/");
   };
