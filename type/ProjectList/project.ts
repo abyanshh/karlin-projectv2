@@ -1,44 +1,30 @@
 export type Project = {
   id: string;
-  po?: number;
-  name?: string;
-  client?: string;
+  po: string;
+  client: string;
   pic?: string;
   status: string;
   progress?: number;
   deadline?: string;
-  team?: number;
-  description?: string;
   NameSales?: string;
 }
 
 export type Task = {
   id: string;
-  name: string;
+  project_id: string;
+  nama: string;
   description?: string;
   file_url?: string;
   status: string;
 }
 
-export type Member = {
-  id: string;
-  image: string;
-  name: string;
-  email?: string;
-  role: string;
-  lastOnline?: string;
-}
-
 export interface ProfileMember {
   id: string;
-  name: string;
-  image: string;
-  email?: string;
-  phone?: string;
-  birthdate?:string;
-  position?: string;
-  department?: string;
-  location?: string;
-  bio?: string;
-  joinDate?:string;
+  user_nama: string;
+  image_url: string;
+  email: string;
+  no_hp?: string;
+  ttl?:string;
+  role: string;
+  jabatan?: string;
 }

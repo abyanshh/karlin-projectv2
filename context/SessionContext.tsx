@@ -39,13 +39,13 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   // }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await api.post("/login", { email, password });
+    const res = await api.post("api/auth/login", { email, password });
     
     const newAccessToken = res.data.accessToken;
     setAccessToken(newAccessToken);
     api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
 
-    const me = await api.get("/me");
+    const me = await api.get("/api/profile/me");
     setUser(me.data);
   };
 
