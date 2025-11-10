@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/layout/app-sidebar";
 import AppHeader from "@/layout/app-header";
 import HeaderSection from "@/components/dashboard/header-app"; 
+import { useSession } from "@/context/SessionContext";
 
 export default function DashboardShell({
   children,
@@ -13,6 +14,7 @@ export default function DashboardShell({
 }) {
   const pathname = usePathname();
   const { id, task } = useParams();
+  const user = useSession();
   const hideHeader = 
   pathname.startsWith("/dashboard/profile") || 
   pathname.startsWith(`/dashboard/projects/${id}/edit`)||
@@ -26,7 +28,7 @@ export default function DashboardShell({
   const getHeaderContent = (path: string) => {
     if (path === "/dashboard") {
       return {
-        title: "Halo John Doe!",
+        title: `Halo, ${user.name}`,
         subtitle: "Selamat datang di Karlin Mastrindo Project Manager.",
       };
     } else if (path === "/dashboard/projects") {

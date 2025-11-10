@@ -36,7 +36,9 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSession } from "@/context/SessionContext";
 
+const { user } = useSession();
 const menuItems = [
   {
     title: "Dashboard",
@@ -48,15 +50,11 @@ const menuItems = [
     url: "/dashboard/projects",
     icon: FolderOpen,
   },
-  // {
-  //   title: "Kalender",
-  //   url: "/dashboard/calendar",
-  //   icon: Calendar,
-  // },
   {
     title: "Staff",
     url: "/dashboard/team",
     icon: Users,
+    showIf: (user: { role: string; }) => user.role === "admin",
   },
 ];
 
@@ -124,13 +122,16 @@ export const AppSidebar = () => {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    JD
+                    {user?.name
+                      ?.split(" ")
+                      .map((n: string) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left">
-                  <p className="font-medium text-sm">John Doe</p>
+                  <p className="font-medium text-sm">{user?.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    Project Manager
+                    {user?.email}
                   </p>
                 </div>
               </Button>

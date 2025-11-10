@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,8 +12,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { projectData } from "@/data/project";
 import type { Project } from "@/type/ProjectList/project";
+import { useSession } from "@/context/SessionContext";
+import api from "@/lib/axios";
+import { useEffect, useState } from "react";
 
 // === Util untuk tampilkan status ===
 const getStatusBadge = (status: string) => {
@@ -127,7 +131,7 @@ function ProjectList({
               <div className="flex items-center space-x-4 w-1/3">
                 {getStatusIcon(project.status)}
                 <div>
-                  <h3 className="font-semibold">{project.name}</h3>
+                  <h3 className="font-semibold">{project.po}</h3>
                   <p className="text-sm text-muted-foreground">
                     {project.client}
                   </p>
@@ -144,8 +148,8 @@ function ProjectList({
                   <p className="text-sm font-medium">{project.deadline}</p>
                 </div>
                 <div className="flex flex-col w-1/5 text-center">
-                  <p className="text-sm text-muted-foreground">Tim</p>
-                  <p className="text-sm font-medium">{project.team} orang</p>
+                  <p className="text-sm text-muted-foreground">PIC</p>
+                  <p className="text-sm font-medium">{project.pic}</p>
                 </div>
                 <div className="flex w-2/5 items-center justify-end gap-4">
                   {getStatusBadge(project.status)}
@@ -168,18 +172,22 @@ function ProjectList({
 }
 
 // === Komponen Utama Page ===
-export default async function Page() {
-  // ✅ Contoh: role dikirim dari backend lewat token decode
-  const user = { name: "John", role: "pm" };
+export default function Page() {
+  const { user } = useSession();
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  let projects: Project[] = [];
-  try {
-    projects = projectData;
-  } catch (error) {
-    console.error("Gagal memuat data project:", error);
-  }
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await api.get("/api/project");
+        setProjects(res.data);
+      } catch (err) {
+        console.error("Gagal memuat project:", err);
+      }
+    };
+    fetchProjects();
+  }, []);
 
-  // === Kondisi Render berdasarkan Role ===
   return (
     <div className="p-6 space-y-6">
       {user.role === "admin" || user.role === "sales" && (

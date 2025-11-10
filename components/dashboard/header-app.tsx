@@ -1,5 +1,7 @@
+'use client';
 import Image from "next/image";
 import { BreadcrumbDemo } from "../breadcrumb-project";
+import { useSession } from "@/context/SessionContext";
 
 const HeaderSection = ({
   title,
