@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "@/context/SessionContext";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import api from "@/lib/axios";
 
 const LoginForm = () => {
-  const { login } = useSession();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,7 +26,10 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      const { data } = await api.post("/auth/login", formData);
+      sessionStorage.setItem("accessToken", data.accessToken);
+      const user = await api.get("/profile/me");
+      sessionStorage.setItem("user", JSON.stringify(user.data.profile));
 
       toast({
         title: "Login berhasil!",

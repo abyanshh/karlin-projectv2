@@ -36,7 +36,6 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useSession } from "@/context/SessionContext";
 
 const menuItems = [
   {
@@ -53,14 +52,14 @@ const menuItems = [
     title: "Staff",
     url: "/dashboard/team",
     icon: Users,
-    showIf: (user: { role: string; }) => user.role === "admin",
+    showIf: (user: { role: string; }) => user?.role === "admin",
   },
 ];
 
 export const AppSidebar = () => {
   const router = useRouter();
   const location = usePathname();
-  const { user } = useSession();
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
   const handleLogout = () => {
     router.push("/");
@@ -123,14 +122,14 @@ export const AppSidebar = () => {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {user?.name
+                    {user?.user_nama
                       ?.split(" ")
                       .map((n: string) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left">
-                  <p className="font-medium text-sm">{user?.name}</p>
+                  <p className="font-medium text-sm">{user?.user_nama}</p>
                   <p className="text-xs text-muted-foreground">
                     {user?.email}
                   </p>

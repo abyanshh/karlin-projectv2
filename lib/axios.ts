@@ -1,72 +1,52 @@
+// app/lib/api.ts
 import axios from "axios";
-
+import { refreshAccessToken } from "./auth";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "http://localhost:5000/api",
   withCredentials: true,
 });
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
+// 🟢 Request Interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
-  });
-  failedQueue = [];
-};
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-export const setupInterceptors = (setAccessToken: (token: string) => void, logout: () => void) => {
-  
-  api.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    async (error) => {
-      const originalRequest = error.config;
+// 🔴 Response Interceptor
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        
-        if (isRefreshing) {
-          return new Promise(function(resolve, reject) {
-            failedQueue.push({ resolve, reject });
-          }).then(token => {
-            originalRequest.headers["Authorization"] = "Bearer " + token;
-            return axios(originalRequest);
-          });
+    const originalRequest = error.config;
+
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          console.log("✅Token Refreshed");
+          sessionStorage.setItem("accessToken", newToken);
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+          return api(originalRequest);
         }
-
-        originalRequest._retry = true;
-        isRefreshing = true;
-
-        try {
-          const res = await api.post("/refresh-token"); 
-          const newAccessToken = res.data.accessToken;
-
-          setAccessToken(newAccessToken); 
-          api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-          processQueue(null, newAccessToken); 
-          
-          return api(originalRequest); 
-
-        } catch (refreshError) {
-          processQueue(refreshError, null);
-          logout();
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
+      } catch (err) {
+        console.error("❌ Refresh failed:", err);
       }
-
-      return Promise.reject(error);
     }
-  );
-};
+
+    return Promise.reject(error);
+  }
+);
+
 
 export default api;

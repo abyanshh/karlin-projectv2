@@ -6,10 +6,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Plus, Search } from "lucide-react";
 import { ModeToggle } from "@/components/toggle-theme";
 import Link from "next/link";
-import { useSession } from "@/context/SessionContext";
 
 const AppHeader = () => {
-  const { user } = useSession();
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
       <div className="flex items-center gap-4">

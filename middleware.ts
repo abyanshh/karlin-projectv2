@@ -1,20 +1,24 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const token = req.cookies.get("accessToken")?.value;
+export default function middleware(req: NextRequest) {
+  const refreshToken = req.cookies.get("refreshToken")?.value;
   const { pathname } = req.nextUrl;
+  const PUBLIC_PATHS = ["/login"];
 
-  const publicPaths = ["/login"];
+  if (refreshToken && (pathname === "/" || pathname === "/login")) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 
-  const isPublic = publicPaths.some((route) => pathname.startsWith(route));
+  const isPublic = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  if (!refreshToken && !isPublic) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
-  // if (!token && !isPublic) {
-  //   return NextResponse.redirect(new URL("/login", req.url));
-  // }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|static|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/login|api/register|api/refresh).*)",
+  ],
 };
-
