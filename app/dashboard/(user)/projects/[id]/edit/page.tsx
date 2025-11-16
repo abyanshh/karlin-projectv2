@@ -1,34 +1,53 @@
+'use client'
+
+import { use } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ProjectForm from "@/components/project/ProjectForm";
-import { projectDataList } from "@/data/project";
+import { useEffect, useState } from "react";
+import api from "@/lib/axios";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
-  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/${id}`, {
-  //   cache: "no-store",
-  // });
-  // if (!res.ok) {
-  //   console.error("Gagal memuat data proyek");
-  // }
-  // const project = await res.json();
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
-  const project = projectDataList
+  const { id } = use(params);
 
-  if (!project) {
+  const [data, setData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await api.get(`/project/${id}`);
+        setData(res.data);
+      } catch (error: any) {
+        console.error("❌ Gagal fetch project:", error.response?.status);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) fetchProjects();
+  }, [id]);
+
+  if (isLoading) {
     return (
       <div className="p-6 text-center bg-card w-full rounded-md py-10">
-        <p className="text-muted-foreground text-sm">
-          Data proyek tidak ditemukan.
-        </p>
+        <p className="text-muted-foreground text-sm">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="p-6 text-center bg-card w-full rounded-md py-10">
+        <p className="text-muted-foreground text-sm">Data proyek tidak ditemukan.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href={`/dashboard/projects/${id}`}>
@@ -44,8 +63,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         </div>
       </div>
 
-      <ProjectForm mode="edit" initialData={project} id={id} />
+      <ProjectForm mode="edit" initialData={data.project} id={id} />
     </div>
   );
-};
-
+}

@@ -16,23 +16,23 @@ import {
   Calendar,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ProfileMember } from "@/type/ProjectList/project";
+import api from "@/lib/axios";
 
-interface ProfileData {
-  name?: string;
-  email?: string;
-  phone?: string;
-  birthdate?: string;
-  position?: string;
-  department?: string;
-  location?: string;
-  bio?: string;
-  joinDate?: string;
-}
-
-export default function ProfileForm({ data } : { data: ProfileData }) {
+export default function ProfileForm({ data }: { data: ProfileMember }) {
   const { toast } = useToast();
-  const [profileData, setProfileData] = useState(data);
-  console.log(profileData);
+  const [profileData, setProfileData] = useState<ProfileMember>(
+    {
+      id: data.id,
+      user_nama: data.user_nama ?? "",
+      jabatan: data.jabatan ?? "",
+      email: data.email ?? "",
+      no_hp: data.no_hp ?? "",
+      ttl: data.ttl ?? "",
+      role: data.role ?? "",
+      image_url: data.image_url ?? "",
+    }
+  );
   const handleChange = (field: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
@@ -40,18 +40,14 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profileData),
-    });
+    try {
+      await api.put(`/profile/${data.id}`, profileData);
 
-    if (res.ok) {
       toast({
         title: "Profil berhasil diperbarui",
         description: "Perubahan telah disimpan.",
       });
-    } else {
+    } catch (error) {
       toast({
         title: "Gagal memperbarui profil",
         description: "Terjadi kesalahan saat menyimpan.",
@@ -70,13 +66,13 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
           {/* Nama, Posisi & email */}
           <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Lengkap</Label>
+              <Label htmlFor="user_nama">Nama Lengkap</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="name"
-                  value={profileData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
+                  id="user_nama"
+                  value={profileData.user_nama}
+                  onChange={(e) => handleChange("user_nama", e.target.value)}
                   placeholder="Nama lengkap"
                   className="pl-10"
                 />
@@ -84,20 +80,20 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="position">Posisi</Label>
+              <Label htmlFor="jabatan">Posisi</Label>
               <div className="relative">
                 <UserPen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="position"
-                  value={profileData.position}
-                  onChange={(e) => handleChange("position", e.target.value)}
+                  id="jabatan"
+                  value={profileData.jabatan}
+                  onChange={(e) => handleChange("jabatan", e.target.value)}
                   placeholder="Posisi/Jabatan"
                   className="pl-10"
                 />
               </div>
             </div>
 
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -112,35 +108,32 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
                 />
               </div>
             </div>
-
-            
           </div>
 
           {/* ttl & Telepon */}
           <div className="grid md:grid-cols-2 gap-4">
-            
             <div className="space-y-2">
-                <Label htmlFor="birthdate">Tanggal Lahir</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="birthdate"
-                    type="date"
-                    value={profileData.birthdate || ""}
-                    onChange={(e) => handleChange("birthdate", e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+              <Label htmlFor="ttl">Tanggal Lahir</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="ttl"
+                  type="date"
+                  value={profileData.ttl}
+                  onChange={(e) => handleChange("ttl", e.target.value)}
+                  className="pl-10"
+                />
               </div>
+            </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Nomor Telepon</Label>
+              <Label htmlFor="no_hp">Nomor Telepon</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="phone"
-                  value={profileData.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  id="no_hp"
+                  value={profileData.no_hp}
+                  onChange={(e) => handleChange("no_hp", e.target.value)}
                   className="pl-10"
                   placeholder="+62"
                 />
@@ -150,21 +143,21 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
 
           {/* Departemen & Lokasi */}
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="department">Departemen</Label>
+            {/* <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
               <div className="relative">
                 <FolderCog className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="department"
-                  value={profileData.department}
-                  onChange={(e) => handleChange("department", e.target.value)}
+                  id="role"
+                  value={profileData.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
                   placeholder="Departemen"
                   className="pl-10"
                 />
               </div>
-            </div>
+            </div> */}
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="location">Lokasi</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -176,7 +169,7 @@ export default function ProfileForm({ data } : { data: ProfileData }) {
                   placeholder="Kota, Negara"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Tombol Submit */}

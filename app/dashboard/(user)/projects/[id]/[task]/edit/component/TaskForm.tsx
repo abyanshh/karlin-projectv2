@@ -16,16 +16,13 @@ import {
 } from "@/components/ui/select";
 import { Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Task } from "@/type/ProjectList/project";
+import api from "@/lib/axios";
 
 interface TaskFormProps {
   projectId: string;
   taskId: string;
-  defaultValues?: {
-    title: string;
-    description: string;
-    status: string;
-    deadline: string;
-  };
+  defaultValues?: Task;
 }
 
 const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
@@ -34,10 +31,9 @@ const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
 
   const [formData, setFormData] = useState(
     defaultValues || {
-      title: "",
-      description: "",
+      nama: "",
+      deskripsi: "",
       status: "belum mulai",
-      deadline: "",
     }
   );
 
@@ -61,7 +57,7 @@ const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Nanti bisa diganti axios/ fetch ke API PUT
+    await api.put(`/project/${projectId}/tasks/${taskId}`, formData);
     console.log("Update task:", formData);
 
     toast({
@@ -80,22 +76,22 @@ const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul Task</Label>
+            <Label htmlFor="nama">Judul Task</Label>
             <Input
-              id="title"
-              name="title"
-              value={formData.title}
+              id="nama"
+              name="nama"
+              value={formData.nama}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="deskripsi">Deskripsi</Label>
             <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
+              id="deskripsi"
+              name="deskripsi"
+              value={formData.deskripsi}
               onChange={handleChange}
               rows={5}
             />
@@ -109,23 +105,11 @@ const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
                   <SelectValue placeholder="Pilih status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="belum mulai">Belum Mulai</SelectItem>
+                  <SelectItem value="not_started">Belum Mulai</SelectItem>
                   <SelectItem value="berlangsung">Berlangsung</SelectItem>
                   <SelectItem value="selesai">Selesai</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="deadline">Deadline</Label>
-              <Input
-                id="deadline"
-                name="deadline"
-                type="date"
-                value={formData.deadline}
-                onChange={handleChange}
-                required
-              />
             </div>
           </div>
 
@@ -141,3 +125,4 @@ const TaskForm = ({ projectId, taskId, defaultValues }: TaskFormProps) => {
 };
 
 export default TaskForm;
+

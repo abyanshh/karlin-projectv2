@@ -4,14 +4,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import type { Project } from "@/type/ProjectList/project";
-
 
 // ✅ Schema Validasi
 const projectSchema = z.object({
@@ -19,7 +25,7 @@ const projectSchema = z.object({
   client: z.string().min(1, "Nama client wajib diisi"),
   deadline: z.string().min(1, "Deadline wajib diisi"),
   status: z.string().min(1, "Status wajib diisi"),
-  ID_sales: z.string().min(1, "ID Sales wajib diisi"),
+  // ID_sales: z.string().min(1, "ID Sales wajib diisi"),
 });
 
 // ✅ Tipe Form
@@ -31,10 +37,27 @@ interface ProjectFormProps {
   initialData?: Project;
 }
 
-export default function ProjectForm({ mode, id, initialData }: ProjectFormProps) {
+export default function ProjectForm({
+  mode,
+  id,
+  initialData,
+}: ProjectFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        po: initialData.po || "",
+        client: initialData.client || "",
+        deadline: initialData.deadline?.split("T")[0] || "",
+        status: initialData.status || "",
+        // ID_sales: initialData.ID_sales || "",
+      });
+      console.log(initialData);
+    }
+  }, [initialData]);
 
   // ✅ Setup React Hook Form
   const form = useForm<ProjectFormValues>({
@@ -45,14 +68,14 @@ export default function ProjectForm({ mode, id, initialData }: ProjectFormProps)
           client: initialData.client || "",
           deadline: initialData.deadline?.split("T")[0] || "",
           status: initialData.status || "",
-          ID_sales: initialData.ID_sales || "",
+          // ID_sales: initialData.ID_sales || "",
         }
       : {
           po: "",
           client: "",
           deadline: "",
           status: "",
-          ID_sales: "",
+          // ID_sales: "",
         },
   });
 
@@ -63,21 +86,24 @@ export default function ProjectForm({ mode, id, initialData }: ProjectFormProps)
       if (mode === "create") {
         await api.post("/project", values);
         toast({
-        title: "Tambah berhasil!",
-      });
+          title: "Tambah berhasil!",
+        });
       } else if (mode === "edit" && id) {
         await api.put(`/project/${id}`, values);
         toast({
-        title: "Edit berhasil!",
-      });
+          title: "Edit berhasil!",
+        });
       }
       router.push("/dashboard/projects");
       router.refresh();
     } catch (error: any) {
       console.error("❌ Error submit:", error.response?.data || error);
-       toast({
+      toast({
         title: "Gagal Menyimpan",
-        description: `${error.response?.data?.message || "Terjadi kesalahan saat menyimpan data."}`,
+        description: `${
+          error.response?.data?.message ||
+          "Terjadi kesalahan saat menyimpan data."
+        }`,
       });
       setLoading(false);
     }
@@ -91,55 +117,73 @@ export default function ProjectForm({ mode, id, initialData }: ProjectFormProps)
       <div className="grid gap-4 md:grid-cols-2">
         {/* PO */}
         <div>
-          <Label htmlFor="po">Nomor PO</Label>
+          <Label className="mb-2" htmlFor="po">Nomor PO</Label>
           <Input
             id="po"
             {...form.register("po")}
             placeholder="Masukkan nomor PO"
           />
           {form.formState.errors.po && (
-            <p className="text-red-500 text-sm mt-2">{form.formState.errors.po.message}</p>
+            <p className="text-red-500 text-sm mt-2">
+              {form.formState.errors.po.message}
+            </p>
           )}
         </div>
 
         {/* Client */}
         <div>
-          <Label htmlFor="client">Client</Label>
+          <Label className="mb-2" htmlFor="client">Client</Label>
           <Input
             id="client"
             {...form.register("client")}
             placeholder="Nama client"
           />
           {form.formState.errors.client && (
-            <p className="text-red-500 text-sm mt-2">{form.formState.errors.client.message}</p>
+            <p className="text-red-500 text-sm mt-2">
+              {form.formState.errors.client.message}
+            </p>
           )}
         </div>
 
         {/* Deadline */}
         <div>
-          <Label htmlFor="deadline">Deadline</Label>
+          <Label className="mb-2" htmlFor="deadline">Deadline</Label>
           <Input id="deadline" type="date" {...form.register("deadline")} />
           {form.formState.errors.deadline && (
-            <p className="text-red-500 text-sm mt-2">{form.formState.errors.deadline.message}</p>
+            <p className="text-red-500 text-sm mt-2">
+              {form.formState.errors.deadline.message}
+            </p>
           )}
         </div>
 
         {/* Status */}
         <div>
-          <Label htmlFor="status">Status</Label>
-          <Input
-            id="status"
-            {...form.register("status")}
-            placeholder="cth: In Progress, Done"
-          />
+          <Label className="mb-2" htmlFor="status">Status</Label>
+
+          <Select
+            value={form.watch("status")}
+            onValueChange={(value) => form.setValue("status", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pilih status" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="active">In Progress</SelectItem>
+              <SelectItem value="done">Done</SelectItem>
+            </SelectContent>
+          </Select>
+
           {form.formState.errors.status && (
-            <p className="text-red-500 text-sm mt-2">{form.formState.errors.status.message}</p>
+            <p className="text-red-500 text-sm mt-2">
+              {form.formState.errors.status.message}
+            </p>
           )}
         </div>
 
         {/* Sales ID */}
-        <div>
-          <Label htmlFor="ID_sales">ID Sales</Label>
+        {/* <div>
+          <Label className="mb-2" htmlFor="ID_sales">ID Sales</Label>
           <Input
             id="ID_sales"
             {...form.register("ID_sales")}
@@ -148,7 +192,7 @@ export default function ProjectForm({ mode, id, initialData }: ProjectFormProps)
           {form.formState.errors.ID_sales && (
             <p className="text-red-500 text-sm mt-2">{form.formState.errors.ID_sales.message}</p>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Submit */}

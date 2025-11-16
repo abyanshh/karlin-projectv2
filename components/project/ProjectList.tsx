@@ -1,24 +1,44 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
-import { MoreHorizontal, CheckCircle2, Clock, AlertCircle, Calendar, User } from "lucide-react";
+import {
+  MoreHorizontal,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Calendar,
+  User,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 import type { Project } from "@/type/ProjectList/project";
-import SearchFragment from "./search-bar";
+import { UserSession } from "@/hooks/useUser";
 
 interface ProjectListProps {
   data: Project[];
+  user: UserSession | null;
 }
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "completed":
-      return <Badge className="bg-green-100 text-green-800 border-green-200">Selesai</Badge>;
+    case "done":
+      return (
+        <Badge className="bg-green-100 text-green-800 border-green-200">
+          Selesai
+        </Badge>
+      );
     case "active":
-      return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Berlangsung</Badge>;
+      return (
+        <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+          Berlangsung
+        </Badge>
+      );
     case "planning":
-      return <Badge className="bg-orange-100 text-orange-800 border-orange-200">Perencanaan</Badge>;
+      return (
+        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+          Perencanaan
+        </Badge>
+      );
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -26,7 +46,7 @@ const getStatusBadge = (status: string) => {
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case "completed":
+    case "done":
       return <CheckCircle2 className="h-4 w-4 text-green-600" />;
     case "active":
       return <Clock className="h-4 w-4 text-blue-600" />;
@@ -37,13 +57,15 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
+const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
   return (
     <>
-      <SearchFragment />
       <div className="grid gap-6">
         {projects.map((project) => (
-          <Card key={project.id} className="hover:shadow-elegant transition-all duration-300">
+          <Card
+            key={project.id}
+            className="hover:shadow-elegant transition-all duration-300"
+          >
             <CardContent>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
@@ -67,9 +89,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Sales</p>
-                    <p className="text-sm font-medium">
-                      {project.ID_sales}
-                    </p>
+                    <p className="text-sm font-medium">{project.ID_sales}</p>
                   </div>
                 </div>
 
@@ -78,9 +98,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Deadline</p>
-                    <p className="text-sm font-medium">
-                      {project.deadline}
-                    </p>
+                    <p className="text-sm font-medium">{project.deadline}</p>
                   </div>
                 </div>
 
@@ -89,17 +107,27 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects }) => {
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">PIC</p>
-                    <p className="text-sm font-medium">{project.ID_pic||"Belum ada"}</p>
+                    <p className="text-sm font-medium">
+                      {project.ID_pic || "Belum ada"}
+                    </p>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link href={`/dashboard/projects/${project.id}`}>Detail</Link>
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link href={`/dashboard/projects/${project.id}/edit`}>Edit</Link>
+                <div className="grid grid-cols-2 items-center gap-2 justify-end">
+                  {user?.role === "admin" ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/dashboard/projects/${project.id}/edit`}>
+                        Edit
+                      </Link>
+                    </Button>
+                  ) : (
+                    <div></div>
+                  )}
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/dashboard/projects/${project.id}`}>
+                      Detail
+                    </Link>
                   </Button>
                 </div>
               </div>

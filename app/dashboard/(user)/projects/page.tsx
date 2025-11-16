@@ -1,31 +1,17 @@
 'use client';
 import ProjectList from "@/components/project/ProjectList";
-import api from "@/lib/axios";
-import { projectData } from "@/data/project";
-import type { Project } from "@/type/ProjectList/project";
-import { useEffect, useState } from "react";
-const page = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { data } = await api.get<{ projects: Project[] }>("/project");
-        setProjects(data.projects);
-      } catch (error: any) {
-        console.error("❌ Gagal fetch project:", error.response?.status, error.response?.data);
-      }
-      setLoading(false);
-    };
-    fetchProjects();
-  }, []);
+import SearchFragment from "@/components/project/search-bar";
+import ProjectListSkeleton from "@/components/project/ProjectListSkeleton";
+import { useProjects } from "@/hooks/useProjects";
+import { useUser } from "@/hooks/useUser";
+const Page = () => {
+  const user = useUser();
+  const { projects, loading } = useProjects();
+  const completed = projects.filter(p => p.status === "done");
 
   if (loading) {
     return (
-      <div className="p-6 text-center bg-card w-full rounded-md py-10">
-        <p className="text-muted-foreground text-sm">Loading...</p>
-      </div>
+      <ProjectListSkeleton />
     );
   }
   
@@ -41,10 +27,11 @@ const page = () => {
 
   return (
     <div className="space-y-4">
-      <ProjectList data={projects} />
+      <SearchFragment />
+      <ProjectList data={projects} user={user} />
     </div>
   );
 };
 
-export default page;
+export default Page;
 

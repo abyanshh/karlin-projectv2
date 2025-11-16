@@ -20,35 +20,27 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { Member } from "@/type/ProjectList/project";
+import { ProfileMember } from "@/type/ProjectList/project";
 
 interface TeamListProps {
-  initialMembers: Member[];
-  allUsers: Member[];
-  projectId: string;
+  initialMembers: ProfileMember[];
+  allUsers: ProfileMember[];
+  projectId: string | undefined;
 }
 
 export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps) {
-  const [members, setMembers] = useState<Member[]>(initialMembers);
+  const [members, setMembers] = useState<ProfileMember[]>(initialMembers);
   const [isDialogOpen, setDialogOpen] = useState(false);
 
-  const handleAddMember = (userToAdd: Member) => {
+  const handleAddMember = (userToAdd: ProfileMember) => {
     if (!members.find(member => member.id === userToAdd.id)) {
       setMembers([...members, userToAdd]);
 
-      // fetch(`/api/project/${projectId}/members`, {
-      //   method: "POST",
-      //   body: JSON.stringify({ userId: userToAdd.id }),
-      // });
     }
   };
 
   const handleRemoveMember = (memberId: string) => {
     setMembers(members.filter(member => member.id !== memberId));
-
-    // fetch(`/api/project/${projectId}/members/${memberId}`, {
-    //   method: "DELETE",
-    // });
   };
 
 
@@ -74,11 +66,11 @@ export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps)
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback>
-                          {user.name.charAt(0)}
+                          {user.user_nama.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.name}</p>
+                        <p className="font-medium">{user.user_nama}</p>
                         <p className="text-xs text-muted-foreground">
                           {user.role}
                         </p>
@@ -104,22 +96,19 @@ export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps)
           </DialogContent>
         </Dialog>
       </div>
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
         {members.map((member) => (
           <Card key={member.id}>
             <CardContent className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={member.image} alt={member.name} />
-                  <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={member.image_url} alt={member.user_nama} />
+                  <AvatarFallback>{member.user_nama.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-sm">{member.name}</p>
+                  <p className="font-medium text-sm">{member.user_nama}</p>
                   <p className="text-xs text-muted-foreground">
                     {member.role}
-                  </p>
-                  <p className="text-xs text-muted-foreground italic">
-                    {member.lastOnline}
                   </p>
                 </div>
               </div>

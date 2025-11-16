@@ -70,7 +70,7 @@ export default function DashboardShell({
         <div className="bg-card p-4 rounded-xl">
           <Spinner className="w-5 h-5" />
         </div>
-        <p className="text-muted-foreground">Memuat data pengguna...</p>
+        <p className="text-muted-foreground">Memuat data Aplikasi...</p>
       </div>
     );
   }

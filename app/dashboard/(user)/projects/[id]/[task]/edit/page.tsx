@@ -1,24 +1,20 @@
+'use client'
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import TaskForm from "./component/TaskForm";
+import { useTaskDetail } from "@/hooks/useTaskDetail";
+import { use } from "react";
 
 interface PageProps {
-  params: { id: string; task: string };
+  params: Promise<{ id: string; task: string }>;
 }
 
-
-const EditTaskPage = async ({ params }: PageProps) => {
-  const { id, task } = params;
-
-  const data = {
-    title: "Dokumentasi Projek Tahap 1",
-    description:
-      "Dokumentasikan seluruh progres tahap 1 termasuk kebutuhan, desain awal, dan alur sistem.",
-    status: "berlangsung",
-    deadline: "2025-11-05",
-  };
-
+const EditTaskPage = ({ params }: PageProps) => {
+  const { id, task } = use(params);
+  const { data, loading } = useTaskDetail(id, task);
+  if (loading) return <div>Loading...</div>;
   return (
     <div className=" space-y-6">
       <div className="flex items-center gap-3">

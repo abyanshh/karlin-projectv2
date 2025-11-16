@@ -1,9 +1,14 @@
+'use client';
+
 import ProfileOverview from "@/components/profile/ProfileOverview";
 import ProfileForm from "@/components/profile/ProfileForm";
+import { useUser } from "@/hooks/useUser";
 
 export default function ProfilePage() {
+  
+  const user = useUser();
   const profile = {
-    name: "John Doe",
+    user_nama: "John Doe",
     email: "john.doe@karlinmastrindo.com",
     phone: "+62 812 3456 7890",
     birthdate: "2000-01-01",
@@ -14,6 +19,8 @@ export default function ProfilePage() {
     joinDate: "January 2020",
   };
 
+  if (!user) return null;
+
   return (
     <div className="space-y-6">
       <div>
@@ -23,8 +30,8 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      <ProfileOverview data={profile} />
-      <ProfileForm data={profile} />
+      <ProfileOverview data={user} />
+      <ProfileForm data={user} />
     </div>
   );
 }

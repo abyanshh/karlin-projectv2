@@ -3,17 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Shield, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProfileMember } from "@/type/ProjectList/project";
 
-interface ProfileData {
-  name?: string;
-  position?: string;
-  department?: string;
-  location?: string;
-  joinDate?: string;
-}
-
-
-export default function ProfileOverview({ data }: { data: ProfileData }) {
+export default function ProfileOverview({ data }: { data: ProfileMember }) {
   return (
     <Card>
       <CardContent className="p-6">
@@ -21,9 +13,9 @@ export default function ProfileOverview({ data }: { data: ProfileData }) {
           {/* Avatar Section */}
           <div className="relative">
             <Avatar className="w-24 h-24">
-              <AvatarImage src="/placeholder.svg" />
+              <AvatarImage src={data.image_url} />
               <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                {data.name
+                {data.user_nama
                   ?.split(" ")
                   .map((n: string) => n[0])
                   .join("")}
@@ -40,10 +32,10 @@ export default function ProfileOverview({ data }: { data: ProfileData }) {
 
           {/* Info Section */}
           <div className="flex-1 space-y-1">
-            <h2 className="text-2xl font-bold">{data.name}</h2>
-            <p className="text-muted-foreground">{data.position}</p>
+            <h2 className="text-2xl font-bold">{data.user_nama}</h2>
+            <p className="text-muted-foreground">{data.role}</p>
             <p className="text-sm text-muted-foreground">
-              {data.department} • Bergabung {data.joinDate}
+              {data.jabatan}
             </p>
 
             <div className="flex items-center space-x-4 mt-3">
@@ -51,10 +43,10 @@ export default function ProfileOverview({ data }: { data: ProfileData }) {
                 <Shield className="h-3 w-3 mr-1" />
                 Verified
               </Badge>
-              <div className="flex items-center text-sm text-muted-foreground">
+              {/* <div className="flex items-center text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mr-1" />
-                {data.location}
-              </div>
+                {data?.location}
+              </div> */}
             </div>
           </div>
         </div>

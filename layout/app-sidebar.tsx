@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -121,17 +121,21 @@ export const AppSidebar = () => {
                 className="w-full justify-start space-x-3 h-12"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {user?.user_nama
-                      ?.split(" ")
-                      .map((n: string) => n[0])
-                      .join("")}
-                  </AvatarFallback>
+                  {user?.image_url ? (
+                    <AvatarImage src={user?.image_url} className="rounded-full" />
+                  ) : (
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                      {user?.usernama
+                        ?.split(" ")
+                        .map((n: string) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
                 <div className="text-left">
                   <p className="font-medium text-sm">{user?.user_nama}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.email}
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {user?.jabatan}
                   </p>
                 </div>
               </Button>
