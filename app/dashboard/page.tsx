@@ -3,7 +3,8 @@ import { useUser } from "@/hooks/useUser";
 import { useProjects } from "@/hooks/useProjects";
 import { AdminStatsSkeleton, ProjectListSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { AdminStats, ProjectList } from "@/components/dashboard/DashboardList";
-import { useEffect } from "react";
+import { useEffect} from "react";
+
 
 export default function Page() {
   const user = useUser();
@@ -12,7 +13,7 @@ export default function Page() {
   if (loading || !projects) {
     return (
       <div className="p-6 space-y-6">
-        {(user?.role === "admin" || user?.role === "sales") && <AdminStatsSkeleton />}
+        {(user?.role === "admin") && <AdminStatsSkeleton />}
         <ProjectListSkeleton />
       </div>
     );
@@ -24,34 +25,34 @@ export default function Page() {
         <>
            {overview && <AdminStats overview={overview} />}
           <ProjectList title="Taken Project List" 
-            projects={projects?.filter(project=> project?.PIC !== null)} 
+            projects={projects?.filter(project=> project?.PIC !== null && project?.status == "active")} 
           />
-          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null)} />
+          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null && project?.status == "active")} />
         </>
       )}
 
       {(user?.role === "sales") && (
         <>
-           {overview && <AdminStats overview={overview} />}
           <ProjectList title="Taken Project List" 
-            projects={projects?.filter(project=> project?.PIC !== null)} 
+            projects={projects?.filter(project=> project?.PIC !== null && project?.status == "active")} 
           />
-          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null)} />
+          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null && project?.status == "active")} />
         </>
       )}
 
       {user?.role === "pm" && (
         <>
           <ProjectList title="Taken Project List" 
-            projects={projects?.filter(projects=> projects?.PIC !== null)} 
+            projects={projects?.filter(projects=> projects?.PIC !== null && projects?.status == "active")} 
           />
-          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null)} />
+          <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null && project?.status == "active")} />
         </>
       )}
 
       {user?.role === "staff" && (
         <>
-          <ProjectList title="Project List" projects={projects} />
+          <ProjectList title="Project List" 
+          projects={ projects?.filter(project=> project?.status == "active" )} />
         </>
       )}
     </div>

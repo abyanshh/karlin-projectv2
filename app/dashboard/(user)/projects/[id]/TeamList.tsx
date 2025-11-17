@@ -108,7 +108,7 @@ export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps)
                 <div>
                   <p className="font-medium text-sm">{member.user_nama}</p>
                   <p className="text-xs text-muted-foreground">
-                    {member.role}
+                    {member.jabatan}
                   </p>
                 </div>
               </div>

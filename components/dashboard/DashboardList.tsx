@@ -71,7 +71,7 @@ export function ProjectList({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {projects.slice(0, 3).map((project) => (
+          {projects.slice(0, 5).map((project) => (
             <Link
               key={project.id}
               href={`/dashboard/projects/${project.id}`}
