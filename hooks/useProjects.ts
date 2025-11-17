@@ -6,21 +6,24 @@ import { OverviewStats, Project } from "@/type/ProjectList/project";
 import { useUser } from "./useUser";
 
 export function useProjects() {
+  const user  = useUser();        
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<OverviewStats | null>(null);
-  const user = useUser()
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchProjects = async () => {
       try {
-        const { data } = await api.get("/project")
+        const { data } = await api.get("/project");
         setProjects(data.projects);
-        if(user?.role === "admin" || user?.role === "sales"){
+
+        if (user.role === "admin") {
           const data2 = await api.get("/project/overview");
           setOverview(data2.data.overview);
         }
-      } catch (error) { 
+      } catch (error) {
         console.error("Gagal mengambil data proyek:", error);
       } finally {
         setLoading(false);
@@ -28,7 +31,7 @@ export function useProjects() {
     };
 
     fetchProjects();
-  }, []);
+  }, [user]);
 
   return { loading, projects, overview };
 }
