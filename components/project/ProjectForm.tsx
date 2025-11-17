@@ -25,7 +25,7 @@ const projectSchema = z.object({
   client: z.string().min(1, "Nama client wajib diisi"),
   deadline: z.string().min(1, "Deadline wajib diisi"),
   status: z.string().min(1, "Status wajib diisi"),
-  // ID_sales: z.string().min(1, "ID Sales wajib diisi"),
+  nama_sales: z.string().min(1, "Nama sales wajib diisi")
 });
 
 // ✅ Tipe Form
@@ -52,8 +52,8 @@ export default function ProjectForm({
         po: initialData.po || "",
         client: initialData.client || "",
         deadline: initialData.deadline?.split("T")[0] || "",
-        status: initialData.status || "",
-        // ID_sales: initialData.ID_sales || "",
+        nama_sales: initialData.Sales.user_nama || ""
+      
       });
       console.log(initialData);
     }
@@ -68,14 +68,15 @@ export default function ProjectForm({
           client: initialData.client || "",
           deadline: initialData.deadline?.split("T")[0] || "",
           status: initialData.status || "",
-          // ID_sales: initialData.ID_sales || "",
+          nama_sales: initialData.Sales.user_nama || ""
+        
         }
       : {
           po: "",
           client: "",
           deadline: "",
           status: "",
-          // ID_sales: "",
+          nama_sales: ""
         },
   });
 
@@ -156,44 +157,21 @@ export default function ProjectForm({
           )}
         </div>
 
-        {/* Status */}
+        {/* Sales ID */}
         <div>
-          <Label className="mb-2" htmlFor="status">Status</Label>
-
-          <Select
-            value={form.watch("status")}
-            onValueChange={(value) => form.setValue("status", value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Pilih status" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="active">In Progress</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {form.formState.errors.status && (
-            <p className="text-red-500 text-sm mt-2">
-              {form.formState.errors.status.message}
-            </p>
+          <Label htmlFor="nama_sales">Nama Sales</Label>
+          <Input
+            id="nama_sales"
+            {...form.register("nama_sales")}
+            placeholder="Masukkan Nama Sales"
+          />
+          {form.formState.errors.nama_sales && (
+            <p className="text-red-500 text-sm mt-2">{form.formState.errors.nama_sales.message}</p>
           )}
         </div>
-
-        {/* Sales ID */}
-        {/* <div>
-          <Label className="mb-2" htmlFor="ID_sales">ID Sales</Label>
-          <Input
-            id="ID_sales"
-            {...form.register("ID_sales")}
-            placeholder="Masukkan ID Sales"
-          />
-          {form.formState.errors.ID_sales && (
-            <p className="text-red-500 text-sm mt-2">{form.formState.errors.ID_sales.message}</p>
-          )}
-        </div> */}
       </div>
+
+        
 
       {/* Submit */}
       <div className="flex justify-end">
