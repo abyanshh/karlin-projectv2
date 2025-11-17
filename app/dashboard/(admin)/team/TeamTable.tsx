@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  ColumnDef,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -13,27 +12,9 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Copy,
-  MoreHorizontal,
-  Plus,
-  Trash2,
-  User2,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -43,8 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Image from "next/image";
-import { getTimeAgo } from "@/lib/TimeAgo";
 import {
   Dialog,
   DialogClose,
@@ -56,199 +35,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useStaffList } from "@/hooks/useStaffList";
+import { columns } from "./columns";
+import { TableSkeleton } from "./TableSkeleton";
+import api from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 
-export type User = {
-  id: string;
-  image: string;
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  role: string;
-  lastOnline: string;
-};
-
-// ==== DATA DUMMY ====
-const data: User[] = [
-  {
-    id: "m5gr84i9",
-    image: "https://github.com/shadcn.png",
-    name: "John Doe",
-    email: "ken99@example.com",
-    phone: "+62 812-3456-7890",
-    location: "Jakarta",
-    role: "Staff",
-    lastOnline: "2025-10-24T18:30:00Z",
-  },
-  {
-    id: "3u1reuv4",
-    image: "https://github.com/shadcn.png",
-    name: "Jane Smith",
-    email: "Abe45@example.com",
-    phone: "+62 813-2222-4444",
-    location: "Bandung",
-    role: "Staff",
-    lastOnline: "2025-10-22T18:30:00Z",
-  },
-  {
-    id: "derv1ws0",
-    image: "https://github.com/shadcn.png",
-    name: "Alex Johnson",
-    email: "Monserrat44@example.com",
-    phone: "+62 857-1122-3344",
-    location: "Surabaya",
-    role: "Admin",
-    lastOnline: "2025-10-20T18:30:00Z",
-  },
-  {
-    id: "5kma53ae",
-    image: "https://github.com/shadcn.png",
-    name: "Lisa Brown",
-    email: "Silas22@example.com",
-    phone: "+62 895-1234-5678",
-    location: "Bali",
-    role: "Staff",
-    lastOnline: "2025-10-19T18:30:00Z",
-  },
-];
-
-// ==== KOLOM TABLE ====
-export const columns: ColumnDef<User>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <div
-        className="flex gap-2 items-center cursor-pointer"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Name
-        <ArrowUpDown className="w-4 h-4" />
-      </div>
-    ),
-    cell: ({ row }) => {
-      const member = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <Image
-            src={member.image}
-            alt={member.name}
-            width={25}
-            height={25}
-            className="rounded-full"
-          />
-          <div className="font-medium">{member.name}</div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <div
-        className="flex gap-2 items-center cursor-pointer"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Email
-        <ArrowUpDown className="w-4 h-4" />
-      </div>
-    ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({ row }) => <div>{row.getValue("phone")}</div>,
-  },
-  {
-    accessorKey: "location",
-    header: "Location",
-    cell: ({ row }) => <div>{row.getValue("location")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) => (
-      <div
-        className="flex gap-2 items-center cursor-pointer"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Role
-        <ArrowUpDown className="w-4 h-4" />
-      </div>
-    ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
-  },
-  {
-    accessorKey: "lastOnline",
-    header: () => <div className="text-right">Last Online</div>,
-    cell: ({ row }) => {
-      const formatted = getTimeAgo(row.getValue("lastOnline"));
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const user = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
-            >
-              <Copy />
-              Copy ID
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <User2 /> View Profile
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 />
-              Remove
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
-// ==== KOMPONEN TABLE ====
 export function TeamTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [adding, setAdding] = useState(false);
+  const { toast } = useToast();
+  const { staffList, loading, refetch } = useStaffList();
+
+  const data = staffList || [];
 
   const table = useReactTable({
     data,
@@ -269,6 +71,42 @@ export function TeamTable() {
     },
   });
 
+  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setAdding(true);
+
+    try {
+      const form = new FormData(e.currentTarget);
+
+      await addUser(form);
+      await refetch();
+
+      toast({
+        title: "Berhasil menambahkan user",
+      });
+      (e.target as HTMLFormElement).reset();
+    } catch (err: any) {
+      toast({
+        title: "Gagal menambahkan user",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  async function addUser(formData: FormData) {
+    const response = await api.post("/staff/add", formData);
+    if (!response.data.success) {
+      throw new Error(response.data.message);
+    }
+  }
+
+  if (loading) {
+    return <TableSkeleton columns={columns.length} />;
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4 justify-between">
@@ -281,51 +119,61 @@ export function TeamTable() {
           className="max-w-sm bg-card"
         />
         <Dialog>
-          <form action="">
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Plus /> Add User
-              </Button>
-            </DialogTrigger>
+  <DialogTrigger asChild>
+    <Button size="sm" variant="outline">
+      <Plus /> Add User
+    </Button>
+  </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add User</DialogTitle>
-                <DialogDescription>
-                  Add a new member to the app.
-                </DialogDescription>
-              </DialogHeader>
+  <DialogContent className="sm:max-w-[425px]">
+    <form onSubmit={handleAddUser}>
+      <DialogHeader>
+        <DialogTitle>Add User</DialogTitle>
+        <DialogDescription>
+          Add a new member to the app.
+        </DialogDescription>
+      </DialogHeader>
 
-              <div className="grid gap-4">
-                <div className="grid gap-3">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" placeholder="Pedro Duarte" />
-                </div>
+      <div className="grid gap-4 mt-4">
+        <div className="grid gap-3">
+          <Label htmlFor="user_nama">Name</Label>
+          <Input id="user_nama" name="user_nama" required />
+        </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    placeholder="example@gmail.com"
-                  />
-                </div>
+        <div className="grid gap-3">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" name="email" required />
+        </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="role">Role</Label>
-                  <Input id="role" name="role" placeholder="Staff" />
-                </div>
-              </div>
+        <div className="grid gap-3">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" name="password" type="password" required />
+        </div>
 
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button type="submit">Save changes</Button>
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
+        <div className="grid gap-3">
+          <Label htmlFor="role">Role</Label>
+          <Input id="role" name="role" required />
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="jabatan">Jabatan</Label>
+          <Input id="jabatan" name="jabatan" required />
+        </div>
+      </div>
+
+      <DialogFooter className="mt-4">
+        <DialogClose asChild>
+          <Button variant="outline" type="button">Cancel</Button>
+        </DialogClose>
+
+        <Button type="submit" disabled={adding}>
+          {adding ? "Saving..." : "Save changes"}
+        </Button>
+      </DialogFooter>
+    </form>
+  </DialogContent>
+</Dialog>
+
       </div>
 
       <div className="rounded-md border bg-card">

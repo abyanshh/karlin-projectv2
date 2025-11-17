@@ -10,6 +10,7 @@ export interface Project {
   client: string;
   pic?: string;
   status: string;
+  nama_sales?: string;
   progress?: number;
   deadline?: string;
   team: ProfileMember[];
@@ -25,7 +26,7 @@ export interface Task {
 
 export interface ProfileMember {
   id: string;
-  user_nama?: string;
+  user_nama: string;
   image_url?: string;
   email?: string;
   no_hp?: string;
@@ -33,3 +34,10 @@ export interface ProfileMember {
   role?: string;
   jabatan?: string;
 }
+
+export type OverviewStats = {
+  active_projects: number;
+  taken_projects: number;
+  close_to_deadline: number;
+  past_deadline: number;
+};

@@ -23,14 +23,14 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
   const { toast } = useToast();
   const [profileData, setProfileData] = useState<ProfileMember>(
     {
-      id: data.id,
-      user_nama: data.user_nama ?? "",
-      jabatan: data.jabatan ?? "",
-      email: data.email ?? "",
-      no_hp: data.no_hp ?? "",
-      ttl: data.ttl ?? "",
-      role: data.role ?? "",
-      image_url: data.image_url ?? "",
+      id: data?.id,
+      user_nama: data?.user_nama ?? "",
+      jabatan: data?.jabatan ?? "",
+      email: data?.email ?? "",
+      no_hp: data?.no_hp ?? "",
+      ttl: data?.ttl ?? "",
+      role: data?.role ?? "",
+      image_url: data?.image_url ?? "",
     }
   );
   const handleChange = (field: string, value: string) => {

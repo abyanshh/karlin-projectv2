@@ -13,9 +13,9 @@ export default function ProfileOverview({ data }: { data: ProfileMember }) {
           {/* Avatar Section */}
           <div className="relative">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={data.image_url} />
+              <AvatarImage src={data?.image_url} />
               <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                {data.user_nama
+                {data?.user_nama
                   ?.split(" ")
                   .map((n: string) => n[0])
                   .join("")}
@@ -32,10 +32,10 @@ export default function ProfileOverview({ data }: { data: ProfileMember }) {
 
           {/* Info Section */}
           <div className="flex-1 space-y-1">
-            <h2 className="text-2xl font-bold">{data.user_nama}</h2>
-            <p className="text-muted-foreground">{data.role}</p>
+            <h2 className="text-2xl font-bold">{data?.user_nama}</h2>
+            <p className="text-muted-foreground">{data?.role}</p>
             <p className="text-sm text-muted-foreground">
-              {data.jabatan}
+              {data?.jabatan}
             </p>
 
             <div className="flex items-center space-x-4 mt-3">

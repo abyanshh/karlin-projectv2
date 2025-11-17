@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { User, Clock, Handshake, SquarePen } from "lucide-react";
-
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { useProjectTasks } from "@/hooks/useProjectTasks";
 // import { useProjectMembers } from "@/hooks/useProjectMembers";
@@ -21,7 +20,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { tasks, loading: loadingTasks, refetch } = useProjectTasks(id);
   const loading = loadingProject || loadingTasks;
 
-  if (loading) return <div></div>;
+  if (loading) return <Card className="text-muted-foreground text-center">Loading...</Card>;
+  if (!project) return <Card>Projek tidak Tersedia</Card>
 
   return (
     <Card>
@@ -108,8 +108,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       {/* ==== TEAM LIST ==== */}
       <CardContent>
         <TeamList
-          initialMembers={Object.values(project?.team ?? {})}
-          allUsers={Object.values(project?.team ?? {})}
+          initialMembers={Object.values(project.team ?? {})}
+          allUsers={Object.values(project.team ?? {})}
           projectId={project?.id}
         />
       </CardContent>

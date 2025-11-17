@@ -52,7 +52,7 @@ const menuItems = [
     title: "Staff",
     url: "/dashboard/team",
     icon: Users,
-    showIf: (user: { role: string; }) => user?.role === "admin",
+    showIf: (user: { role: string }) => user?.role === "admin",
   },
 ];
 
@@ -93,25 +93,30 @@ export const AppSidebar = () => {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-2 p-2">
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location === item.url}>
-                    <Link
-                      href={item.url}
-                      className="flex items-center space-x-3"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems
+                .filter((item) => {
+                  if (item.showIf) return item.showIf(user);
+                  return true;
+                })
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={location === item.url}>
+                      <Link
+                        href={item.url}
+                        className="flex items-center space-x-3"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-        <SidebarSeparator className="mx-auto"/>
+      <SidebarSeparator className="mx-auto" />
       <SidebarFooter>
         <div className="p-2">
           <DropdownMenu>
@@ -122,7 +127,10 @@ export const AppSidebar = () => {
               >
                 <Avatar className="h-8 w-8">
                   {user?.image_url ? (
-                    <AvatarImage src={user?.image_url} className="rounded-full" />
+                    <AvatarImage
+                      src={user?.image_url}
+                      className="rounded-full"
+                    />
                   ) : (
                     <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                       {user?.usernama
