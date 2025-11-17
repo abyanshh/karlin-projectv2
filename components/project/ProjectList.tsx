@@ -11,12 +11,11 @@ import {
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
-import type { Project } from "@/type/ProjectList/project";
-import { UserSession } from "@/hooks/useUser";
+import type { ProfileMember, Project } from "@/type/ProjectList/project";
 
 interface ProjectListProps {
   data: Project[];
-  user: UserSession | null;
+  user: ProfileMember | null;
 }
 
 const getStatusBadge = (status: string) => {
@@ -89,7 +88,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Sales</p>
-                    <p className="text-sm font-medium">{project.ID_sales}</p>
+                    <p className="text-sm font-medium">{project.Sales.user_nama}</p>
                   </div>
                 </div>
 
@@ -108,7 +107,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
                   <div>
                     <p className="text-sm text-muted-foreground">PIC</p>
                     <p className="text-sm font-medium">
-                      {project.ID_pic || "Belum ada"}
+                      {project.PIC?.user_nama || "Belum ada"}
                     </p>
                   </div>
                 </div>

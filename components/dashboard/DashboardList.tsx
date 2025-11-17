@@ -3,17 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowDownToLine, CheckCircle2, TriangleAlert, AlertCircle, Clock, MoreHorizontal } from "lucide-react";
-import type { Project } from "@/type/ProjectList/project";
+import type { OverviewStats, Project } from "@/type/ProjectList/project";
 import { Badge } from "../ui/badge";
 
-export function AdminStats({ projects }: { projects: Project[] }) {
+export function AdminStats({ overview }: { overview: OverviewStats }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       <Card>
         <CardContent className="p-6 flex justify-between">
           <div>
             <p className="text-sm text-muted-foreground">Projek Masuk</p>
-            <p className="text-3xl font-bold">{projects.length}</p>
+            <p className="text-3xl font-bold">{overview?.active_projects}</p>
           </div>
           <ArrowDownToLine className="h-8 w-8 text-blue-600" />
         </CardContent>
@@ -23,7 +23,7 @@ export function AdminStats({ projects }: { projects: Project[] }) {
         <CardContent className="p-6 flex justify-between">
           <div>
             <p className="text-sm text-muted-foreground">Projek Diambil</p>
-            <p className="text-3xl font-bold">{projects.length}</p>
+            <p className="text-3xl font-bold">{overview?.taken_projects}</p>
           </div>
           <CheckCircle2 className="h-8 w-8 text-green-600" />
         </CardContent>
@@ -34,7 +34,7 @@ export function AdminStats({ projects }: { projects: Project[] }) {
           <div>
             <p className="text-sm text-muted-foreground">Mendekati Deadline</p>
             <p className="text-3xl font-bold">
-              {projects.filter((p) => p.status === "in-progress").length}
+              {overview?.close_to_deadline}
             </p>
           </div>
           <TriangleAlert className="h-8 w-8 text-yellow-600" />
@@ -46,7 +46,7 @@ export function AdminStats({ projects }: { projects: Project[] }) {
           <div>
             <p className="text-sm text-muted-foreground">Melewati Deadline</p>
             <p className="text-3xl font-bold">
-              {projects.filter((p) => p.status === "completed").length}
+              {overview?.past_deadline}
             </p>
           </div>
           <AlertCircle className="h-8 w-8 text-red-600" />

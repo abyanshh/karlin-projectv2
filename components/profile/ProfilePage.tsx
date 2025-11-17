@@ -2,25 +2,17 @@
 
 import ProfileOverview from "@/components/profile/ProfileOverview";
 import ProfileForm from "@/components/profile/ProfileForm";
-import { useUser } from "@/hooks/useUser";
+import { useProfile } from "@/hooks/useProfile";
+import { ProfileSkeleton } from "./ProfileSkeleton";
 
 export default function ProfilePage() {
   
-  const user = useUser();
-  const profile = {
-    user_nama: "John Doe",
-    email: "john.doe@karlinmastrindo.com",
-    phone: "+62 812 3456 7890",
-    birthdate: "2000-01-01",
-    position: "Senior Project Manager",
-    department: "Project Management",
-    location: "Jakarta, Indonesia",
-    bio: "Experienced project manager with 8+ years in managing complex IT projects.",
-    joinDate: "January 2020",
-  };
+  const {user, loading} = useProfile();
 
-  if (!user) return null;
-
+  if (loading) return <ProfileSkeleton/>;
+  if (!user) {
+    return <div>Gagal memuat profil. Silakan coba lagi.</div>;
+  }
   return (
     <div className="space-y-6">
       <div>
