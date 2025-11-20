@@ -17,6 +17,8 @@ export function useProjects() {
     const fetchProjects = async () => {
       try {
         const { data } = await api.get("/project");
+        console.log("Data proyek diterima:", data);
+        console.log("User role:", user.role);
         setProjects(data.projects);
 
         if (user.role === "admin") {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { useUser } from "@/hooks/useUser";
 import { User, Clock, Handshake, SquarePen } from "lucide-react";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { useProjectTasks } from "@/hooks/useProjectTasks";
@@ -15,7 +16,7 @@ import { use } from "react";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-
+  const user = useUser();
   const { project, loading: loadingProject } = useProjectDetail(id);
   const { tasks, loading: loadingTasks, refetch } = useProjectTasks(id);
   const loading = loadingProject || loadingTasks;
@@ -29,25 +30,42 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <CardHeader>
         <div className="relative mt-2">
           <div className="dark:hidden bg-gradient-to-r from-orange-500/70 to-amber-400/50 h-50 md:h-100 rounded-xl mask-b-from-0"></div>
-          <div className="dark:block hidden bg-gradient-to-r from-slate-900/80 to-blue-600/50 h-50 md:h-100 rounded-xl mask-b-from-0"></div>
+          <div className="dark:block hidden bg-gradient-to-r from-slate-900/80 to-blue-600/50 h-50 md:h-40 rounded-xl mask-b-from-0"></div>
           <div className="absolute inset-0 bg-black/20 rounded-t-xl mask-b-from-0"></div>
           <div className="absolute space-y-2 w-full bottom-0 p-6 md:block hidden">
             <div className="flex justify-between">
               <CardTitle className="text-xl md:text-3xl">
                 {project?.po}
               </CardTitle>
+            
+              {user?.role === "admin" || user?.role === "sales" && project?.ID_pic == null &&  (
+              <div className="flex justify-end">
               <Link href={`/dashboard/projects/${project?.id}/edit`}>
                 <Button className="cursor-pointer">
                   <SquarePen className="mr-2" />
                   Edit Proyek
                 </Button>
               </Link>
+              </div>
+              )}
+
+              {user?.role === "pm" && project?.ID_pic == null &&  (
+              <div className="flex justify-end">
+              <Link href={`/dashboard/projects/${project?.id}`}>
+                <Button className="cursor-pointer">
+                  Ambil Proyek
+                </Button>
+              </Link>
+              </div>
+              )}
+              
+              
             </div>
             <div className="flex gap-6">
               <span className="flex gap-2 items-center">
                 <User className="h-4 w-4" />
                 <span>PIC : </span>
-                <h2>{project?.pic}</h2>
+                <h2>{project?.PIC?.user_nama|| "-"}</h2>
               </span>
               <span className="flex gap-2 items-center">
                 <Handshake className="h-4 w-4" />
@@ -58,6 +76,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 <Clock className="h-4 w-4" />
                 {project?.deadline}
               </span>
+              <span className="flex gap-2 items-center">
+                <User className="h-4 w-4" />
+                <span>Sales : </span>
+                <h2>{project?.Sales?.user_nama|| "-"}</h2>
+              </span>
+
+              
             </div>
           </div>
         </div>
@@ -79,7 +104,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <div className="flex flex-col md:flex-row gap-6 text-xs md:text-md">
             <span className="flex gap-2 items-center">
               <User className="h-4 w-4" />
-              <h2>{project?.pic}</h2>
+              <h2>{project?.PIC?.user_nama || "-"}</h2>
             </span>
             <span className="flex gap-2 items-center">
               <Handshake className="h-4 w-4" />

@@ -43,7 +43,7 @@ export default function Page() {
       {user?.role === "pm" && (
         <>
           <ProjectList title="Taken Project List" 
-            projects={projects?.filter(projects=> projects?.PIC !== null && projects?.status == "active")} 
+            projects={projects?.filter(projects=> projects?.ID_pic == user.id && projects?.status == "active")} 
           />
           <ProjectList title="Available Project List" projects={projects?.filter(project=> project?.PIC == null && project?.status == "active")} />
         </>

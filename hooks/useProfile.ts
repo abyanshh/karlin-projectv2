@@ -13,7 +13,6 @@ export function useProfile() {
       try {
         const { data } = await api.get("/profile/me");
         
-        console.log("Data profil diterima:", data); 
 
         setUser(data.profile); 
       } catch (error) {

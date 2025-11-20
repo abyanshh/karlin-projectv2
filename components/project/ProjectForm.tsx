@@ -61,14 +61,13 @@ export default function ProjectForm({
           po: initialData.po || "",
           client: initialData.client || "",
           deadline: initialData.deadline?.split("T")[0] || "",
-          // status: initialData.status || "",
+  
           nama_sales: initialData.Sales.user_nama || "",
         }
       : {
           po: "",
           client: "",
           deadline: "",
-          // status: "",
           nama_sales: "",
         },
   });

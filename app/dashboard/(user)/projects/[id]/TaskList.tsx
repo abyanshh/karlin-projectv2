@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LayoutList, SquarePen } from "lucide-react";
@@ -20,6 +21,7 @@ import api from "@/lib/axios";
 import type { Task } from "@/type/ProjectList/project";
 
 export const TaskList = ({
+  
   initialTasks,
   projectId,
   onTaskCreated,
@@ -32,6 +34,7 @@ export const TaskList = ({
   const [taskDesc, setTaskDesc] = useState("");
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const user = useUser();
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,14 +67,16 @@ export const TaskList = ({
       <div className="flex items-center space-x-2">
         <h2 className="text-xl font-semibold">Tasks</h2>
 
+        
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+          {( user?.role === "admin" || user?.role === "sales" ) && (
           <DialogTrigger asChild>
             <Button variant="link">
               <SquarePen className="mr-2" />
               Add Task
             </Button>
           </DialogTrigger>
-
+            )}
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Create Task</DialogTitle>

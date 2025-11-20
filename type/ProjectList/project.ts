@@ -8,7 +8,7 @@ export interface Project {
   id: string;
   po: string;
   client: string;
-  pic?: string;
+  ID_pic?: string;
   status: string;
   nama_sales?: string;
   progress?: number;
@@ -41,3 +41,10 @@ export type OverviewStats = {
   close_to_deadline: number;
   past_deadline: number;
 };
+
+type Role = "admin" | "sales" | "pm" | "staff";
+
+export interface User {
+  id: string;
+  role: Role;
+}
