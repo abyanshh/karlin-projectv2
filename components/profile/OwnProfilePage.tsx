@@ -1,13 +1,13 @@
 'use client';
 
-import ProfileOverview from "@/components/profile/ProfileOverview";
-import ProfileForm from "@/components/profile/ProfileForm";
-import { useProfile } from "@/hooks/useProfile";
+import ProfileOverview from "@/components/profile/OwnProfileOverview";
+import ProfileForm from "@/components/profile/OwnProfileForm";
+import { useOwnProfile } from "@/hooks/useProfile";
 import { ProfileSkeleton } from "./ProfileSkeleton";
 
 export default function ProfilePage() {
   
-  const {user, loading} = useProfile();
+  const {user, loading} = useOwnProfile();
 
   if (loading) return <ProfileSkeleton/>;
   if (!user) {

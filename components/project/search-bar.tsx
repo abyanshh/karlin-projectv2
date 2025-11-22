@@ -2,6 +2,12 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Input } from "@/components/ui/input";
 import { Funnel, ListFilter, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Table } from "@tanstack/react-table"; // 1. Import tipe Table
+
+// 2. Definisikan interface props
+interface SearchFragmentProps<TData> {
+  table: Table<TData>;
+}
 
 const SearchFragment = () => {
   return (

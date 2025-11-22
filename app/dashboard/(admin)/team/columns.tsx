@@ -9,7 +9,7 @@ import {
   Trash2,
   User2,
 } from "lucide-react";
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -21,6 +21,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProfileMember } from "@/type/ProjectList/project";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import api from "@/lib/axios";
+import { handleDelete } from "@/hooks/useStaffList";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+
 
 export const columns: ColumnDef<ProfileMember>[] = [
   {
@@ -106,25 +121,27 @@ export const columns: ColumnDef<ProfileMember>[] = [
         className="flex gap-2 items-center cursor-pointer"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Role
+        Jabatan
         <ArrowUpDown className="w-4 h-4" />
       </div>
     ),
     cell: ({ row }) => <div className="capitalize">{row.getValue("jabatan")}</div>,
   },
-  {
-    accessorKey: "ttl",
-    header: () => <div className="text-right">TTL</div>,
-    cell: ({ row }) => {
-      const ttl = row.getValue("ttl") as string | null;
-      return <div className="text-right font-medium">{ttl || "-"}</div>;
-    },
-  },
+  // {
+  //   accessorKey: "ttl",
+  //   header: () => <div className="text-left">TTL</div>,
+  //   cell: ({ row }) => {
+  //     const ttl = row.getValue("ttl") as string | null;
+  //     return <div className="text-left font-medium">{ttl || "-"}</div>;
+  //   },
+  // },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const user = row.original;
+      const { toast } = useToast();
+     
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -135,20 +152,54 @@ export const columns: ColumnDef<ProfileMember>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
-            >
-              <Copy />
-              Copy ID
-            </DropdownMenuItem>
+            
+            <Link 
+            key={user.id}
+            href={`/dashboard/team/${user.id}`}>
             <DropdownMenuItem>
-              <User2 /> View Profile
+                  <User2 /> View Profile
             </DropdownMenuItem>
+            </Link>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <Dialog>
+            <DialogTrigger asChild> 
+            <DropdownMenuItem className="text-destructive" key={user.id} onSelect={(e) => e.preventDefault()}>
               <Trash2 />
-              Remove
+              Hapus User
             </DropdownMenuItem>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-[425px]">
+    
+            <DialogHeader>
+              <DialogTitle>Hapus User</DialogTitle>
+              <DialogDescription>
+                Apakah anda yakin ingin menghapus user {user.user_nama} dari daftar staff?
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+              <Button variant="outline" type="button">Batal</Button>
+              </DialogClose>
+
+              
+                <Button
+                variant="destructive"
+                type="button"
+                onClick={async () => {
+                  await handleDelete(user.id);
+                  window.location.reload();
+                   toast({
+                    title: "User Dihapus",
+                    description: `User ${user.user_nama} telah berhasil dihapus dari daftar staff.`,
+                    });
+                }}
+                > Hapus User
+                </Button>
+            </DialogFooter>
+            </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

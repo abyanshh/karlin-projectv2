@@ -45,7 +45,7 @@ export function ProfileSkeleton() {
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-10 w-full" />
           </div>
-          <Skeleton className="h-10 w-28" />
+         
         </CardContent>
       </Card>
     </div>

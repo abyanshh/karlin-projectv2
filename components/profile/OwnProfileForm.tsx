@@ -75,6 +75,7 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
                   onChange={(e) => handleChange("user_nama", e.target.value)}
                   placeholder="Nama lengkap"
                   className="pl-10"
+                  disabled
                 />
               </div>
             </div>
@@ -89,6 +90,7 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
                   onChange={(e) => handleChange("jabatan", e.target.value)}
                   placeholder="Posisi/Jabatan"
                   className="pl-10"
+                  disabled
                 />
               </div>
             </div>
@@ -122,6 +124,7 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
                   value={profileData.ttl}
                   onChange={(e) => handleChange("ttl", e.target.value)}
                   className="pl-10"
+                  disabled
                 />
               </div>
             </div>
@@ -136,6 +139,7 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
                   onChange={(e) => handleChange("no_hp", e.target.value)}
                   className="pl-10"
                   placeholder="+62"
+                  disabled
                 />
               </div>
             </div>
@@ -172,15 +176,8 @@ export default function ProfileForm({ data }: { data: ProfileMember }) {
             </div> */}
           </div>
 
-          {/* Tombol Submit */}
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Save className="h-4 w-4 mr-2" /> Simpan Perubahan
-            </Button>
-          </div>
+        
+          
         </CardContent>
       </Card>
     </form>

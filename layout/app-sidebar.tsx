@@ -27,9 +27,8 @@ import { Button } from "@/components/ui/button";
 import {
   Home,
   FolderOpen,
-  Calendar,
   Users,
-  Settings,
+  Clock,
   User,
   LogOut,
 } from "lucide-react";
@@ -52,6 +51,12 @@ const menuItems = [
     title: "Staff",
     url: "/dashboard/team",
     icon: Users,
+    showIf: (user: { role: string }) => user?.role === "admin",
+  },
+  {
+    title: "Projek Selesai",
+    url: "/dashboard/history",
+    icon: Clock,
     showIf: (user: { role: string }) => user?.role === "admin",
   },
 ];
@@ -155,12 +160,12 @@ export const AppSidebar = () => {
                   Profil
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings">
                   <Settings className="h-4 w-4 mr-2" />
                   Pengaturan
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="h-4 w-4 mr-2" />

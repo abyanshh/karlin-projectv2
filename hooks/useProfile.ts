@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { ProfileMember } from "@/type/ProjectList/project";
 
-export function useProfile() {
+export function useOwnProfile() {
   const [user, setUser] = useState<ProfileMember | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +24,32 @@ export function useProfile() {
 
     fetchProfile();
   }, []);
+
+  return { loading, user };
+}
+
+export function useProfile(id: string) {
+  const [user, setUser] = useState<ProfileMember | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchProfile = async () => {
+      try {
+        const { data } = await api.get(`/profile/${id}`);
+        
+
+        setUser(data.profile); 
+      } catch (error) {
+        console.error("Gagal mengambil data profil:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [id]);
 
   return { loading, user };
 }

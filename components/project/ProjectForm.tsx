@@ -9,13 +9,7 @@ import api from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Project } from "@/type/ProjectList/project";
 
@@ -193,8 +187,41 @@ export default function ProjectForm({
           )}
         </div>
       </div>
+          <div className="flex items-center justify-between">
+              <Dialog>
+          <DialogTrigger asChild>
+            <Button type="button" variant="destructive" className="flex justify-end gap-2 mt-4" >
+              Hapus Project
+            </Button>
+          </DialogTrigger>
 
-        
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Hapus Project?</DialogTitle>
+              <DialogDescription>
+                Tindakan ini tidak dapat dibatalkan. Project akan dihapus permanen.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Batal</Button>
+              </DialogClose>
+
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  await api.delete(`/project/${id}`);
+                  toast({ title: "Project berhasil dihapus!" });
+                  router.push("/dashboard/projects");
+                  router.refresh();
+                }}
+              >
+                Hapus
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
       {/* Submit */}
       <div className="flex justify-end">
@@ -205,6 +232,8 @@ export default function ProjectForm({
             ? "Tambah Proyek"
             : "Simpan Perubahan"}
         </Button>
+
+      </div>
       </div>
     </form>
   );

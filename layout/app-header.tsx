@@ -15,7 +15,7 @@ const AppHeader = () => {
         <SidebarTrigger />
       </div>
       <div className="flex items-center space-x-4">
-        {(user?.role === "admin" || user?.role === "pm") && (
+        {(user?.role === "admin" || user?.role === "sales") && (
           <Button
             asChild
             className="bg-primary hover:bg-primary/90 text-primary-foreground"

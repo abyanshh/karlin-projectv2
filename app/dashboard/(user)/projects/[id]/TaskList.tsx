@@ -35,6 +35,13 @@ export const TaskList = ({
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const user = useUser();
+  const getStatusLabel = (status: string | undefined) => {
+    if (!status) return "";
+    if (status === "completed") return "Selesai";
+    if (status === "in_progress") return "Berlangsung";
+    if (status === "waiting_for_verification") return "Menunggu Verifikasi";
+
+  };
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +76,7 @@ export const TaskList = ({
 
         
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-          {( user?.role === "admin" || user?.role === "sales" ) && (
+          {( user?.role === "admin" || user?.role === "sales" || user?.role === "pm") && (
           <DialogTrigger asChild>
             <Button variant="link">
               <SquarePen className="mr-2" />
@@ -118,8 +125,9 @@ export const TaskList = ({
       </div>
 
       {initialTasks.map((task) => (
-        <Card className="cursor-pointer hover:bg-muted" key={task.id}>
-          <Link href={`/dashboard/projects/${projectId}/${task.id}`}>
+        <Link href={`/dashboard/projects/${projectId}/${task.id}`}>
+          <Card className="cursor-pointer hover:bg-muted" key={task.id}>
+          
             <CardContent>
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
@@ -129,19 +137,19 @@ export const TaskList = ({
 
                 <Badge
                   variant={
-                    task.status === "berlangsung"
+                    task.status === "in_progress"
                       ? "progress"
                       : task.status === "completed"
                       ? "success"
                       : "failed"
                   }
                 >
-                  {task.status}
+                  {getStatusLabel(task?.status)}
                 </Badge>
               </div>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
       ))}
     </div>
   );

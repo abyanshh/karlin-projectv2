@@ -21,33 +21,32 @@ export default function ProfileOverview({ data }: { data: ProfileMember }) {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <Button
+            {/* <Button
               size="sm"
               className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
               variant="outline"
             >
               <Camera className="h-3 w-3" />
-            </Button>
+            </Button> */}
           </div>
 
           {/* Info Section */}
           <div className="flex-1 space-y-1">
             <h2 className="text-2xl font-bold">{data?.user_nama}</h2>
-            <p className="text-muted-foreground">{data?.role}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-2x1 text-muted-foreground">
               {data?.jabatan}
             </p>
 
-            <div className="flex items-center space-x-4 mt-3">
+            {/* <div className="flex items-center space-x-4 mt-3">
               <Badge variant="outline" className="text-green-700 border-green-200">
                 <Shield className="h-3 w-3 mr-1" />
-                Verified
-              </Badge>
+                {data?.role}
+              </Badge> */}
               {/* <div className="flex items-center text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mr-1" />
                 {data?.location}
               </div> */}
-            </div>
+            {/* </div> */}
           </div>
         </div>
       </CardContent>

@@ -5,13 +5,13 @@ import {
   MoreHorizontal,
   CheckCircle2,
   Clock,
-  AlertCircle,
   Calendar,
   User,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 import type { ProfileMember, Project } from "@/type/ProjectList/project";
+
 
 interface ProjectListProps {
   data: Project[];
@@ -32,12 +32,6 @@ const getStatusBadge = (status: string) => {
           Berlangsung
         </Badge>
       );
-    case "planning":
-      return (
-        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-          Perencanaan
-        </Badge>
-      );
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -49,8 +43,6 @@ const getStatusIcon = (status: string) => {
       return <CheckCircle2 className="h-4 w-4 text-green-600" />;
     case "active":
       return <Clock className="h-4 w-4 text-blue-600" />;
-    case "planning":
-      return <AlertCircle className="h-4 w-4 text-orange-600" />;
     default:
       return null;
   }
@@ -60,7 +52,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
   return (
     <>
       <div className="grid gap-6">
-        {projects.map((project) => (
+        {projects.filter((project) => project.status !== "done").map((project) => (
           <Card
             key={project.id}
             className="hover:shadow-elegant transition-all duration-300"
@@ -76,9 +68,6 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusBadge(project.status)}
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
 
@@ -114,7 +103,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ data: projects, user }) => {
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 items-center gap-2 justify-end">
-                  {user?.role === "admin" ? (
+                  {user?.role === "admin" || user?.role === "sales" ? (
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/dashboard/projects/${project.id}/edit`}>
                         Edit

@@ -13,7 +13,13 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
-
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -40,6 +46,7 @@ import { columns } from "./columns";
 import { TableSkeleton } from "./TableSkeleton";
 import api from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react"; // Import icon mata
 
 export function TeamTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -49,6 +56,7 @@ export function TeamTable() {
   const [adding, setAdding] = useState(false);
   const { toast } = useToast();
   const { staffList, loading, refetch } = useStaffList();
+  const [showPassword, setShowPassword] = useState(false);
 
   const data = staffList || [];
 
@@ -69,6 +77,7 @@ export function TeamTable() {
       columnVisibility,
       rowSelection,
     },
+    globalFilterFn: "includesString",
   });
 
   const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -83,6 +92,7 @@ export function TeamTable() {
 
       toast({
         title: "Berhasil menambahkan user",
+        description: "User baru telah ditambahkan ke bagian paling belakang",
       });
       (e.target as HTMLFormElement).reset();
     } catch (err: any) {
@@ -107,30 +117,32 @@ export function TeamTable() {
     return <TableSkeleton columns={columns.length} />;
   }
 
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4 justify-between">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Cari nama atau email..."
+          // Ambil state globalFilter, bukan column specific
+          value={(table.getState().globalFilter as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.setGlobalFilter(event.target.value)
           }
           className="max-w-sm bg-card"
         />
         <Dialog>
   <DialogTrigger asChild>
     <Button size="sm" variant="outline">
-      <Plus /> Add User
+      <Plus /> Tambah User
     </Button>
   </DialogTrigger>
 
   <DialogContent className="sm:max-w-[425px]">
     <form onSubmit={handleAddUser}>
       <DialogHeader>
-        <DialogTitle>Add User</DialogTitle>
+        <DialogTitle>Tambah User</DialogTitle>
         <DialogDescription>
-          Add a new member to the app.
+          Isi data dibawah ini untuk menambahkan user baru
         </DialogDescription>
       </DialogHeader>
 
@@ -146,13 +158,47 @@ export function TeamTable() {
         </div>
 
         <div className="grid gap-3">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" required />
+  <Label htmlFor="password">Password</Label>
+  
+  <div className="relative">
+    <Input
+      id="password"
+      name="password"
+      // Logika utama: jika true jadi text, jika false jadi password
+      type={showPassword ? "text" : "password"} 
+      required
+      // Tambahkan pr-10 (padding-right) agar teks tidak tertutup icon
+      className="pr-10" 
+    />
+    
+            {/* Tombol Icon Mata */}
+            <button
+              type="button" // PENTING: agar tidak men-submit form saat diklik
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" /> // Icon mata dicoret (sembunyikan)
+              ) : (
+                <Eye className="h-4 w-4" />    // Icon mata biasa (lihat)
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-3">
           <Label htmlFor="role">Role</Label>
-          <Input id="role" name="role" required />
+          <Select  name="role" required>
+            <SelectTrigger className="w-full" id="role">
+              <SelectValue placeholder="Pilih role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="sales">Sales</SelectItem>
+              <SelectItem value="pm">Project Manager</SelectItem>
+              <SelectItem value="staff">Staff</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid gap-3">
@@ -177,7 +223,7 @@ export function TeamTable() {
       </div>
 
       <div className="rounded-md border bg-card">
-        <Table className="min-w-6xl">
+        <Table className="min-w-6x1">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
