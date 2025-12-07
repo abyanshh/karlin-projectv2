@@ -2,10 +2,22 @@
 import axios from "axios";
 import { refreshAccessToken } from "./auth";
 
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL,
   withCredentials: true,
 });
+
+// debug the full request URL
+api.interceptors.request.use((config) => {
+  console.debug("[API] Request:", `${config.baseURL}${config.url}`);
+  const token = sessionStorage.getItem("accessToken");
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => Promise.reject(error));
 
 // 🟢 Request Interceptor
 api.interceptors.request.use(

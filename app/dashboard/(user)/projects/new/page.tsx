@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, QrCode } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ProjectForm from "@/components/project/ProjectForm";
@@ -19,6 +19,16 @@ export default function Page() {
             <h1 className="text-2xl font-bold">Buat Proyek Baru</h1>
             <p className="text-muted-foreground">Isi data proyek untuk menambah proyek baru</p>
           </div>
+        </div>
+
+        {/* QR Sales quick access */}
+        <div>
+          <Link href="/dashboard/testing/qr-sales">
+            <Button variant="outline" size="sm">
+              <QrCode className="h-4 w-4 mr-2" />
+              QR Sales
+            </Button>
+          </Link>
         </div>
       </div>
 
