@@ -60,33 +60,38 @@ export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps)
               <DialogTitle>Pilih Anggota</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 overflow-y-auto h-56 pr-4">
-              {allUsers.map((user) => (
-                <Card key={user.id}>
-                  <CardContent className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          {user.user_nama.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{user.user_nama}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.role}
-                        </p>
+              {allUsers.map((user) => {
+                // Add null check here
+                if (!user || !user.user_nama) return null;
+                
+                return (
+                  <Card key={user.id}>
+                    <CardContent className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {user.user_nama.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{user.user_nama}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.role}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      className="text-xs cursor-pointer"
-                      onClick={() => handleAddMember(user)}
-                      disabled={!!members.find(m => m.id === user.id)}
-                    >
-                      {members.find(m => m.id === user.id) ? "Ditambahkan" : "Tambahkan"}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <Button 
+                        size="sm" 
+                        className="text-xs cursor-pointer"
+                        onClick={() => handleAddMember(user)}
+                        disabled={!!members.find(m => m.id === user.id)}
+                      >
+                        {members.find(m => m.id === user.id) ? "Ditambahkan" : "Tambahkan"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
             <DialogFooter>
               <DialogClose asChild>
@@ -97,39 +102,44 @@ export function TeamList({ initialMembers, allUsers, projectId }: TeamListProps)
         </Dialog>
       </div>
       <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-        {members.map((member) => (
-          <Card key={member.id}>
-            <CardContent className="flex justify-between items-center">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={member.image_url} alt={member.user_nama} />
-                  <AvatarFallback>{member.user_nama.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium text-sm">{member.user_nama}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {member.jabatan}
-                  </p>
+        {members.map((member) => {
+          // Add null check
+          if (!member || !member.user_nama) return null;
+          
+          return (
+            <Card key={member.id}>
+              <CardContent className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={member.image_url} alt={member.user_nama} />
+                    <AvatarFallback>{member.user_nama.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium text-sm">{member.user_nama}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {member.jabatan}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem 
-                    className="text-destructive"
-                    onClick={() => handleRemoveMember(member.id)}
-                  >
-                    Remove
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardContent>
-          </Card>
-        ))}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem 
+                      className="text-destructive"
+                      onClick={() => handleRemoveMember(member.id)}
+                    >
+                      Remove
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
