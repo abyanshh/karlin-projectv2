@@ -133,8 +133,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       {/* ==== TEAM LIST ==== */}
       <CardContent>
         <TeamList
-          initialMembers={Object.values(project.team ?? {})}
-          allUsers={Object.values(project.team ?? {})}
+          initialMembers={Object.values(project.team ?? {}).filter(Boolean)}
+          allUsers={Object.values(project.team ?? {}).filter(Boolean)}
           projectId={project?.id}
         />
       </CardContent>
