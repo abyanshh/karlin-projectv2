@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, X } from "lucide-react";
 import type { Project } from "@/type/ProjectList/project";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ==========================
 // ✅ Schema Validasi
@@ -32,6 +33,14 @@ interface ProjectTemplate {
   deadline: string;
   salesName: string;
   tasks: Array<{ nama: string; deskripsi: string }>;
+}
+
+interface SalesUser {
+  id: string;
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
 }
 
 interface ProjectFormProps {
@@ -60,6 +69,23 @@ export default function ProjectForm({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState<Array<{ nama: string; deskripsi: string }>>([]);
+  const [salesList, setSalesList] = useState<SalesUser[]>([]);
+  const [loadingSales, setLoadingSales] = useState(true);
+
+  // Fetch sales list
+  useEffect(() => {
+    const fetchSales = async () => {
+      try {
+        const { data } = await api.get('/project/sales-list', { withCredentials: true });
+        setSalesList(data.sales || []);
+      } catch (error) {
+        console.error('Error fetching sales:', error);
+      } finally {
+        setLoadingSales(false);
+      }
+    };
+    fetchSales();
+  }, []);
 
   // ==========================
   // Form handling
@@ -204,11 +230,22 @@ export default function ProjectForm({
         {/* Nama Sales */}
         <div>
           <Label className="mb-2" htmlFor="nama_sales">Nama Sales</Label>
-          <Input
-            id="nama_sales"
-            {...form.register("nama_sales")}
-            placeholder="Masukkan nama sales"
-          />
+          <Select
+            value={form.watch("nama_sales")}
+            onValueChange={(value) => form.setValue("nama_sales", value)}
+            disabled={loadingSales}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={loadingSales ? "Loading..." : "Pilih Sales"} />
+            </SelectTrigger>
+            <SelectContent>
+              {salesList.map((sales) => (
+                <SelectItem key={sales.id} value={sales.name}>
+                  {sales.name} - {sales.company}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {form.formState.errors.nama_sales && (
             <p className="text-red-500 text-sm mt-2">
               {form.formState.errors.nama_sales.message}
@@ -228,7 +265,7 @@ export default function ProjectForm({
             </Button>
           </div>
           
-          {tasks.length > 0 && (
+          {tasks.length > 0 ? (
             <div className="space-y-3 max-h-60 overflow-y-auto border rounded-lg p-4">
               {tasks.map((task, index) => (
                 <div key={index} className="border rounded-lg p-3 space-y-2 bg-muted/30">
@@ -255,6 +292,10 @@ export default function ProjectForm({
                   />
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 border rounded-lg bg-muted/20">
+              <p className="text-muted-foreground text-sm">Belum ada task ditambahkan</p>
             </div>
           )}
         </div>

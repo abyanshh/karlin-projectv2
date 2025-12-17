@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, QrCode, Download, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import api from '@/lib/axios';
 
 interface Task {
   nama: string;
   deskripsi: string;
+}
+
+interface SalesUser {
+  id: string;
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
 }
 
 export default function QRTemplatePage() {
@@ -26,8 +36,25 @@ export default function QRTemplatePage() {
     { nama: '', deskripsi: '' }
   ]);
 
+  const [salesList, setSalesList] = useState<SalesUser[]>([]);
+  const [loadingSales, setLoadingSales] = useState(true);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [showQR, setShowQR] = useState(false);
+
+  // Fetch sales list
+  useEffect(() => {
+    const fetchSales = async () => {
+      try {
+        const { data } = await api.get('/project/sales-list', { withCredentials: true });
+        setSalesList(data.sales || []);
+      } catch (error) {
+        console.error('Error fetching sales:', error);
+      } finally {
+        setLoadingSales(false);
+      }
+    };
+    fetchSales();
+  }, []);
 
   const handleAddTask = () => {
     setTasks([...tasks, { nama: '', deskripsi: '' }]);
@@ -219,12 +246,22 @@ export default function QRTemplatePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="salesName">Nama Sales <span className="text-red-500">*</span></Label>
-                <Input
-                  id="salesName"
+                <Select
                   value={formData.salesName}
-                  onChange={(e) => setFormData({ ...formData, salesName: e.target.value })}
-                  placeholder="Nama Anda"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, salesName: value })}
+                  disabled={loadingSales}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={loadingSales ? "Loading..." : "Pilih Sales"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {salesList.map((sales) => (
+                      <SelectItem key={sales.id} value={sales.name}>
+                        {sales.name} - {sales.company}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

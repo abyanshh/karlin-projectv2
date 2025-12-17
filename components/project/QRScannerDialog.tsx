@@ -29,6 +29,7 @@ interface QRScannerDialogProps {
 export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
   const [open, setOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const isScanningRef = useRef(false); // Add ref to track scanning state
   const [scanStatus, setScanStatus] = useState('Initializing...');
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -186,6 +187,9 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
           videoRef.current?.play().then(() => {
             console.log('Video playing, starting scan loop');
             setScanStatus('Camera ready - Point at QR code');
+            // Set scanning ref to true right before starting the loop
+            isScanningRef.current = true;
+            console.log('isScanningRef set to:', isScanningRef.current);
             requestAnimationFrame(scanFrame);
           }).catch(err => {
             console.error('Video play error:', err);
@@ -196,11 +200,20 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
       console.error('Camera error:', err);
       alert('Tidak bisa mengakses kamera');
       setIsScanning(false);
+      isScanningRef.current = false;
     }
   };
 
   const scanFrame = () => {
-    if (!isScanning || !videoRef.current || !canvasRef.current) {
+    // Use ref instead of state to avoid closure issues
+    console.log('scanFrame called, isScanningRef.current:', isScanningRef.current);
+    
+    if (!isScanningRef.current || !videoRef.current || !canvasRef.current) {
+      console.log('Scan frame check failed:', {
+        isScanning: isScanningRef.current,
+        hasVideo: !!videoRef.current,
+        hasCanvas: !!canvasRef.current
+      });
       return;
     }
 
@@ -293,6 +306,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
   const stopScanner = () => {
     console.log('Stopping scanner...');
     setIsScanning(false);
+    isScanningRef.current = false;
     
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
