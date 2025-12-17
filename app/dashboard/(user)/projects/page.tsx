@@ -7,7 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { Plus, QrCode } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const Page = () => {
   const user = useUser();
@@ -16,6 +16,13 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>("newest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, sortBy]);
 
   const filteredProjects = useMemo(() => {
     if (!projects) return [];
@@ -41,7 +48,7 @@ const Page = () => {
     result.sort((a, b) => {
       if (sortBy === "newest") {
         // Assuming higher ID means newer if no created_at, or just order by ID descending
-        // But let's check if we can sort by id or if there's a better way. 
+        // But let's check if we can sort by id or if there's a better way.
         // Often ID is sequential or UUID. If UUID, this might not work.
         // Let's assume there might be a date field not visible, or we rely on index?
         // Actually the projects coming from API might be sorted already.
@@ -61,15 +68,22 @@ const Page = () => {
     return result;
   }, [projects, searchQuery, statusFilter, sortBy]);
 
+  const paginatedProjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProjects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProjects, currentPage]);
+
+  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+
   if (loading) {
     return (
       <ProjectListSkeleton />
     );
   }
 
-  // Note: We want to show the search bar even if there are no projects initially? 
+  // Note: We want to show the search bar even if there are no projects initially?
   // Maybe not if completely empty, but if empty after filter we definitely want to show it.
-  // The original code returned early if !projects.length. 
+  // The original code returned early if !projects.length.
   // If we have projects but filter results in 0, we still want to see the UI to clear filter.
   // So we should only early return if the *fetched* projects are empty, not the filtered ones.
   // However, the original code had this check. I will keep it for "no projects data at all".
@@ -119,8 +133,33 @@ const Page = () => {
           </div>
         )}
       </div>
-      {filteredProjects.length > 0 ? (
-        <ProjectList data={filteredProjects} user={user} />
+      {paginatedProjects.length > 0 ? (
+        <>
+          <ProjectList data={paginatedProjects} user={user} />
+          {filteredProjects.length > ITEMS_PER_PAGE && (
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-center py-10 text-muted-foreground">
           Tidak ada proyek yang cocok dengan filter.
