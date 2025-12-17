@@ -39,6 +39,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
   const jsQRRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const frameCountRef = useRef(0);
+  const lastScanTimeRef = useRef(0); // Track last scan time for throttling
 
   // Load jsQR library
   useEffect(() => {
@@ -222,6 +223,14 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
     const context = canvas.getContext('2d');
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      // Throttle scanning to 150ms between attempts (gives camera time to focus)
+      const now = Date.now();
+      if (now - lastScanTimeRef.current < 150) {
+        animationFrameRef.current = requestAnimationFrame(scanFrame);
+        return;
+      }
+      lastScanTimeRef.current = now;
+
       canvas.height = video.videoHeight;
       canvas.width = video.videoWidth;
       
@@ -231,7 +240,19 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
       }
       
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      
+      // Image preprocessing for better QR detection on low-quality cameras
+      const data = imageData.data;
+      const contrast = 1.5; // Increase contrast
+      const brightness = 10; // Slight brightness boost
+      
+      for (let i = 0; i < data.length; i += 4) {
+        // Apply contrast and brightness to RGB channels
+        data[i] = Math.min(255, Math.max(0, contrast * (data[i] - 128) + 128 + brightness));
+        data[i + 1] = Math.min(255, Math.max(0, contrast * (data[i + 1] - 128) + 128 + brightness));
+        data[i + 2] = Math.min(255, Math.max(0, contrast * (data[i + 2] - 128) + 128 + brightness));
+      }
       
       // Log every 60 frames
       frameCountRef.current++;

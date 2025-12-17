@@ -97,7 +97,8 @@ export default function QRTemplatePage() {
     const redirectUrl = `${window.location.origin}/dashboard/projects/new?template=${encodedData}`;
     
     // Generate QR with the URL instead of raw JSON
-    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(redirectUrl)}`;
+    // Larger size (800x800) and high error correction (ecc=H) for better detection on low-quality cameras
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&ecc=H&data=${encodeURIComponent(redirectUrl)}`;
     
     setQrDataUrl(qrApiUrl);
     setShowQR(true);
