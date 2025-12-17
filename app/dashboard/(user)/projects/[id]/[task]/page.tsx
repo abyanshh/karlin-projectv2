@@ -49,15 +49,85 @@ const Page = ({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFiles = e.target.files ? Array.from(e.target.files) : [];
-    if (newFiles.length > 0) {
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-      uploadFiles(newFiles);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!jsQRRef.current) {
+      alert('QR Scanner belum siap. Tunggu sebentar dan coba lagi.');
+      return;
     }
 
-    if (e.target) {
-      e.target.value = "";
+    try {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          
+          canvas.width = img.width;
+          canvas.height = img.height;
+          context?.drawImage(img, 0, 0);
+
+          const imageData = context?.getImageData(0, 0, canvas.width, canvas.height);
+          
+          if (jsQRRef.current && imageData) {
+            const code = jsQRRef.current(imageData.data, imageData.width, imageData.height);
+            
+            if (code && code.data) {
+              try {
+                console.log('Upload QR detected:', code.data);
+                
+                // Try to extract template from URL first
+                let templateData;
+                
+                if (code.data.includes('/dashboard/projects/new?template=')) {
+                  // It's a URL - extract the template parameter
+                  const url = new URL(code.data);
+                  const encodedTemplate = url.searchParams.get('template');
+                
+                  if (encodedTemplate) {
+                    const decoded = atob(encodedTemplate);
+                    templateData = JSON.parse(decoded);
+                    console.log('Decoded from URL:', templateData);
+                  } else {
+                    throw new Error('No template parameter in URL');
+                  }
+                } else {
+                  // Try parsing as direct JSON (backwards compatibility)
+                  templateData = JSON.parse(code.data);
+                  console.log('Parsed as JSON:', templateData);
+                }
+                
+                if (templateData && templateData.type === 'project-template' && templateData.po) {
+                  onScanSuccess(templateData);
+                  setOpen(false);
+                } else {
+                  alert('QR Code ini bukan template project yang valid');
+                }
+              } catch (err) {
+                console.error('Parse error:', err);
+                alert('Format QR Code tidak valid');
+              }
+            } else {
+              alert('Tidak dapat membaca QR Code dari gambar');
+            }
+          }
+        };
+        
+        img.src = e.target?.result as string;
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error reading QR from image:', error);
+      alert('Gagal membaca QR Code dari gambar');
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 

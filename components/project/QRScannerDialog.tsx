@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -36,6 +37,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
   const animationFrameRef = useRef<number | null>(null);
   const jsQRRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const frameCountRef = useRef(0);
 
   // Load jsQR library
   useEffect(() => {
@@ -43,6 +45,10 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
     script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
     script.onload = () => {
       jsQRRef.current = (window as any).jsQR;
+      console.log('jsQR library loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Failed to load jsQR library');
     };
     document.head.appendChild(script);
     
@@ -84,19 +90,52 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
           if (jsQRRef.current && imageData) {
             const code = jsQRRef.current(imageData.data, imageData.width, imageData.height);
             
+            console.log('Upload - QR scan result:', code);
+            
             if (code && code.data) {
+              console.log('Upload - QR data:', code.data);
+              
               try {
-                const data = JSON.parse(code.data);
-                if (data.type === 'project-template' && data.po) {
-                  onScanSuccess(data);
+                // Try to extract template from URL first
+                let templateData;
+                
+                if (code.data.includes('/dashboard/projects/new?template=') || code.data.includes('template=')) {
+                  console.log('Upload - Detected URL format');
+                  // It's a URL - extract the template parameter
+                  const url = new URL(code.data);
+                  const encodedTemplate = url.searchParams.get('template');
+                  
+                  console.log('Upload - Encoded template:', encodedTemplate);
+                  
+                  if (encodedTemplate) {
+                    const decoded = atob(encodedTemplate);
+                    console.log('Upload - Decoded string:', decoded);
+                    templateData = JSON.parse(decoded);
+                    console.log('Upload - Parsed template:', templateData);
+                  } else {
+                    throw new Error('No template parameter in URL');
+                  }
+                } else {
+                  console.log('Upload - Attempting direct JSON parse');
+                  // Try parsing as direct JSON (backwards compatibility)
+                  templateData = JSON.parse(code.data);
+                  console.log('Upload - Parsed as JSON:', templateData);
+                }
+                
+                if (templateData && templateData.type === 'project-template' && templateData.po) {
+                  console.log('Upload - Valid template, calling onScanSuccess');
+                  onScanSuccess(templateData);
                   setOpen(false);
                 } else {
+                  console.warn('Upload - Invalid template structure:', templateData);
                   alert('QR Code ini bukan template project yang valid');
                 }
               } catch (err) {
+                console.error('Upload - Parse error:', err);
                 alert('Format QR Code tidak valid');
               }
             } else {
+              console.log('Upload - No QR code detected in image');
               alert('Tidak dapat membaca QR Code dari gambar');
             }
           }
@@ -107,7 +146,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
 
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Error reading QR from image:', error);
+      console.error('Upload - Error reading QR from image:', error);
       alert('Gagal membaca QR Code dari gambar');
     }
 
@@ -122,6 +161,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
       return;
     }
 
+    console.log('Starting camera scanner...');
     setIsScanning(true);
     setScanStatus('Starting camera...');
     
@@ -134,6 +174,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
         } 
       });
       
+      console.log('Camera stream obtained');
       streamRef.current = stream;
       
       if (videoRef.current) {
@@ -141,7 +182,9 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
         videoRef.current.setAttribute('playsinline', 'true');
         
         videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded');
           videoRef.current?.play().then(() => {
+            console.log('Video playing, starting scan loop');
             setScanStatus('Camera ready - Point at QR code');
             requestAnimationFrame(scanFrame);
           }).catch(err => {
@@ -177,6 +220,12 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       
+      // Log every 60 frames
+      frameCountRef.current++;
+      if (frameCountRef.current % 60 === 0) {
+        console.log('📹 Scanning frame', frameCountRef.current, 'Canvas:', canvas.width, 'x', canvas.height);
+      }
+      
       if (jsQRRef.current && imageData) {
         try {
           const code = jsQRRef.current(imageData.data, imageData.width, imageData.height, {
@@ -184,21 +233,50 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
           });
           
           if (code) {
+            console.log('🎯 Camera - QR Code detected!');
+            console.log('Camera - Raw QR data:', code.data);
             setScanStatus('QR Code terdeteksi! Memproses...');
             
             try {
-              const data = JSON.parse(code.data);
+              // Try to extract template from URL first
+              let templateData;
               
-              if (data.type === 'project-template' && data.po) {
+              if (code.data.includes('/dashboard/projects/new?template=') || code.data.includes('template=')) {
+                console.log('Camera - Detected URL format');
+                // It's a URL - extract the template parameter
+                const url = new URL(code.data);
+                const encodedTemplate = url.searchParams.get('template');
+                
+                console.log('Camera - Encoded template:', encodedTemplate);
+                
+                if (encodedTemplate) {
+                  const decoded = atob(encodedTemplate);
+                  console.log('Camera - Decoded string:', decoded);
+                  templateData = JSON.parse(decoded);
+                  console.log('Camera - Parsed template:', templateData);
+                } else {
+                  throw new Error('No template parameter in URL');
+                }
+              } else {
+                console.log('Camera - Attempting direct JSON parse');
+                // Try parsing as direct JSON (backwards compatibility)
+                templateData = JSON.parse(code.data);
+                console.log('Camera - Parsed as JSON:', templateData);
+              }
+              
+              if (templateData && templateData.type === 'project-template' && templateData.po) {
+                console.log('✅ Camera - Valid template found, stopping scanner');
                 stopScanner();
-                onScanSuccess(data);
+                onScanSuccess(templateData);
                 setOpen(false);
                 return;
               } else {
+                console.warn('⚠️ Camera - Invalid template structure:', templateData);
                 setScanStatus('QR Code bukan template project');
                 setTimeout(() => setScanStatus('Camera ready - Point at QR code'), 2000);
               }
             } catch (parseError) {
+              console.error('❌ Camera - Parse error:', parseError);
               setScanStatus('Format QR tidak valid');
               setTimeout(() => setScanStatus('Camera ready - Point at QR code'), 2000);
             }
@@ -213,6 +291,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
   };
 
   const stopScanner = () => {
+    console.log('Stopping scanner...');
     setIsScanning(false);
     
     if (animationFrameRef.current) {
@@ -224,6 +303,8 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    
+    frameCountRef.current = 0;
   };
 
   const handleClose = (isOpen: boolean) => {
@@ -248,6 +329,9 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
             <QrCode className="h-5 w-5" />
             {isScanning ? 'Scan QR Code' : 'Scan Project Template'}
           </DialogTitle>
+          <DialogDescription>
+            Scan QR template untuk auto-fill data project
+          </DialogDescription>
         </DialogHeader>
 
         {!isScanning ? (
@@ -309,6 +393,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
                     {scanStatus === 'Camera ready - Point at QR code' && '✨ Arahkan ke QR Template'}
                     {scanStatus.includes('terdeteksi') && '✅ QR Code terdeteksi!'}
                     {scanStatus.includes('bukan') && '⚠️ QR Code bukan template'}
+                    {scanStatus.includes('tidak valid') && '❌ Format tidak valid'}
                   </p>
                 </div>
               </div>
@@ -320,6 +405,7 @@ export function QRScannerDialog({ onScanSuccess }: QRScannerDialogProps) {
                 <li>• Pastikan QR code tercetak jelas</li>
                 <li>• Posisikan dalam kotak hijau</li>
                 <li>• Jaga jarak 15-30 cm</li>
+                <li>• Periksa console (F12) untuk log detail</li>
               </ul>
             </div>
             
